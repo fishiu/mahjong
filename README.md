@@ -1,12 +1,24 @@
 # mahjong
 botzone 麻将程序对战作业
 
+#### 基本信息
+
+- 所有麻将牌均以“大写字母+数字”组合表示。
+
+- 如：“W4”表示“四万”，“B6”表示“六筒”，“T8”表示“8条”
+
+- “F1”～“F4”表示“东南西北”，“J1”～“J3”表示“中发白”，“H1”～“H8”表示“春夏秋冬梅兰竹菊”
+
 # 初步分工
 
 写几个最基本函数，输入都是手牌，vector \<string> 的格式
 
 ```c++
-returnType funcName (vector<string> myCards, string lastCard) {}
+// 所有牌命都用系统的命名
+// myCards 手牌
+// lastCard 刚才玩家出的牌（注意，不是我的上家出的牌！）
+// gotCard 我摸到的牌
+returnType funcName (vector<string> myCards, string lastCard, string getCard)
 ```
 
 - 判断胡牌（不考虑番薯），返回bool
