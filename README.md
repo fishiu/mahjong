@@ -1,6 +1,19 @@
 # mahjong
 botzone 麻将程序对战作业
 
+# 初步分工
+
+写几个最基本函数，输入都是手牌，vector \<string> 的格式
+
+```c++
+returnType funcName (vector<string> myCards, string lastCard) {}
+```
+
+- 判断胡牌（不考虑番薯），返回bool
+- 判断碰吃杠，返回写的人看着办我也没想好，反正肯定要说明哪几张
+- 算番 返回番薯
+- 考虑出哪张牌（来不及就搞个随机hhhh）
+
 # 参考资料
 
 ## 资料1
