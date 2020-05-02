@@ -5,7 +5,7 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
-#include <unordered_map>
+#include<unordered_map>
 #include "MahjongGB/MahjongGB.h"
 
 #ifdef _BOTZONE_ONLINE
@@ -447,6 +447,21 @@ int getFan() {
 string init_position() {
     int itmp;
     string stmp;
+    //itmp是轮次，myPlayerID，quan是风圈
+    sin.str(request[0]);
+    sin >> itmp >> myPlayerID >> quan;
+    sin.clear();
+    sin.str(request[1]);
+    for (int j = 0; j < 5; j++) {
+        sin >> itmp;
+        if (j == myPlayerID + 1) {
+            flowerCnt = itmp;
+        }
+    }
+    for (int j = 0; j < 13; j++) {
+        sin >> stmp;
+        hand[myPlayerID].push_back(stmp);
+    }
     for (int i = 2; i <= turnID; i++) {
         sin.clear();
         sin.str(request[i]);
@@ -613,7 +628,6 @@ string play_card() {
         }
     }
     //什么都没有return的时候
-    random_shuffle(hand[myPlayerID].begin(), hand[myPlayerID].end());
     return  *(hand[myPlayerID].rbegin());
 
 }
@@ -734,21 +748,6 @@ int main()
         response.push_back("PASS");
     }
     else {
-        //itmp是轮次，myPlayerID，quan是风圈
-        sin.str(request[0]);
-        sin >> itmp >> myPlayerID >> quan;
-        sin.clear();
-        sin.str(request[1]);
-        for (int j = 0; j < 5; j++) {
-            sin >> itmp;
-            if (j == myPlayerID + 1) {
-                flowerCnt = itmp;
-            }
-        }
-        for (int j = 0; j < 13; j++) {
-            sin >> stmp;
-            hand[myPlayerID].push_back(stmp);
-        }
         //如果这局itmp是2，stmp就是我在这局摸到的牌，如果这局itmp是3，只有别的玩家出牌了才会返回出的是什么牌，其他都返回“Fail”
         stmp = init_position();
         sin.clear();
