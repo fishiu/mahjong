@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include<string.h>
+#include <string.h>
 #include <sstream>
 #include <vector>
 #include <algorithm>
@@ -10,7 +10,7 @@
 #ifdef _BOTZONE_ONLINE
 #include "jsoncpp/json.h"
 #else
-#include <json/json.h>
+#include "json/json.h"
 #endif
 
 #define SIMPLEIO 0
