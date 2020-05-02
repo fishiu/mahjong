@@ -1,10 +1,11 @@
 #include <iostream>
 #include <string>
-#include <cstring>
+#include <string.h>
+#include "stdlib.h"
 #include <sstream>
 #include <vector>
 #include <algorithm>
-#include<unordered_map>
+#include <unordered_map>
 #include "MahjongGB/MahjongGB.h"
 
 #ifdef _BOTZONE_ONLINE
@@ -630,18 +631,20 @@ void decision_to_play_card() {
         sout << "HU";
     }
     else {
+        hand[myPlayerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
         //生成一个自己手中牌的map<string,int>
         refreshMap(myPlayerID);
-
         //判断能否杠
         if (ableGANG(stmp)) {
+            hand[myPlayerID].push_back(stmp);
             sout << "GANG " << stmp;
+            //这里是暗杠，还没处理
             //把手中GANG的牌删掉
             hand[myPlayerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
-            string s = play_card();
-            sout << s;
         }
         else {
+            hand[myPlayerID].push_back(stmp);
+            refreshMap(myPlayerID);
             string s = play_card();
             sout << "PLAY " << s;
         }
