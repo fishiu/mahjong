@@ -1,11 +1,10 @@
 #include <iostream>
 #include <string>
-#include <string.h>
-#include "stdlib.h"
+#include <cstring>
 #include <sstream>
 #include <vector>
 #include <algorithm>
-#include<unordered_map>
+#include <unordered_map>
 #include "MahjongGB/MahjongGB.h"
 
 #ifdef _BOTZONE_ONLINE
