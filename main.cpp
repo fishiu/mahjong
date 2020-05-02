@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include <string.h>
+#include <cstring>
 #include <sstream>
 #include <vector>
 #include <algorithm>
@@ -17,6 +17,8 @@
 //由玩家自己定义，0表示JSON交互，1表示简单交互。
 
 using namespace std;
+ostringstream sout;
+istringstream sin;
 vector<string> myCards = { "F4","F3","F1","F2","J2","J1","J3","B7","B9","W1","W9","T1","T9" };
 string previous(string s) {
     char tmp = --s[1];
@@ -37,6 +39,9 @@ string post(string s) {
 int myPlayerID;
 int flowerCnt = 0;
 int quan;
+int turnID;
+string stmp;
+int itmp;
 
 vector<string> request, response;
 //存所有player手中的牌
@@ -323,7 +328,7 @@ bool ifHU(vector<string> Cards, string lastCards = "n", string gotCard = "n") {
     }
     return false;
 }
-bool ableCHI(string newCard) {
+string ableCHI(string newCard) {
     vector<string> card;
     card = myCards;
     card.push_back(newCard);
@@ -342,20 +347,20 @@ bool ableCHI(string newCard) {
 
     if (str_1[0] == newCard[0] && str_2[0] == newCard[0]) {
         if (newCard[1] - str_1[1] == 1 && str_1[1] - str_2[1] == 1) {
-            return true;
+            return str_1;
         }
     }
     if (str1[0] == newCard[0] && str2[0] == newCard[0]) {
-        if (newCard[1] - str1[1] == -1 && str_1[1] - str2[1] == -1) {
-            return true;
+        if (newCard[1] - str1[1] == -1 && str1[1] - str2[1] == -1) {
+            return str1;
         }
     }
     if (str_1[0] == newCard[0] && str1[0] == newCard[0]) {
         if (newCard[1] - str_1[1] == 1 && str1[1] - newCard[1] == 1) {
-            return true;
+            return newCard;
         }
     }
-    return false;
+    return "Fail";
 }
 
 bool ablePENG(string newCard) {
@@ -379,6 +384,7 @@ bool ableGANG(string newCard) {
 }
 
 int getFan() {
+    return 10;
     // 随便找个玩家，不是我自己就行
     int aPlayerId = (myPlayerID + 3) % 4;
     // 使用前初始化
@@ -436,12 +442,263 @@ int getFan() {
 
     return sum;
 }
+//初始化现在的情况，返回摸到的牌
+string init_position() {
+    int itmp;
+    string stmp;
+    for (int i = 2; i <= turnID; i++) {
+        sin.clear();
+        sin.str(request[i]);
+        sin >> itmp;
+        if (itmp == 2) {
+            sin >> stmp;
+            hand[myPlayerID].push_back(stmp);
+            sin.clear();
+            if (i == turnID) {
+                //return 在这里
+                return stmp;
+            }
+            sin.str(response[i]);
+            sin >> stmp;
+            if (stmp == "PLAY") {
+                sin >> stmp;
+                hand[myPlayerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
+            }
+                //GANG T6 就是暗杠
+            else if (stmp == "GANG") {
+                sin >> stmp;
+                for (int k = 0; k < 4; k++) {
+                    hand[myPlayerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
+                }
+                gang.push_back(stmp);
+            }
+        }
+            //其他情况
+            //3 playerID BUHUA Card1
+        else if (itmp == 3) {
+            int playerID;
+            sin >> playerID;
+            sin >> stmp;
+            //自己playerID的已经读过了
+            if (stmp == "PLAY" && playerID != myPlayerID) {
+                sin >> stmp;
+                hand[4].push_back(stmp);
+                if (i == turnID) {
+                    //返回值在这儿
+                    return stmp;
+                }
+            }
+                //3 playerID PENG Card1
+            else if (stmp == "PENG") {
+                stmp = hand[4][hand[4].size() - 1]; //peng的牌
+                //如果是自己，就需要存peng的情况
+                if (playerID == myPlayerID) {
+                    //存peng
+                    peng.push_back(stmp);
+                    //hand中删掉这三张牌
+                    for (int k = 0; k < 3; k++) {
+                        hand[myPlayerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
+                    }
+                    //map是最后一起生成的，这里不需要做
+                }
+                else {
+                    for (int k = 0; k < 3; k++) {
+                        hand[playerID].push_back(stmp);
+                    }
+                    hand[4].pop_back();
+                    sin >> stmp;
+                    hand[4].push_back(stmp);
+                    if (turnID == i) {
+                        return stmp;
+                    }
+                }
+            }
+                //3 playerID CHI Card1 Card2
+            else if (stmp == "CHI") {
+                sin >> stmp;
+                if (myPlayerID == playerID) {
+                    //chi里面调整
+                    chi.push_back(stmp);
+                    //hand里面调整
+                    hand[playerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), previous(stmp)));
+                    hand[playerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
+                    hand[playerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), post(stmp)));
+                }
+                else {
+                    hand[playerID].push_back(previous(stmp));
+                    hand[playerID].push_back(stmp);
+                    hand[playerID].push_back(post(stmp));
+                    if (i == turnID) {
+                        return stmp;
+                    }
+                }
+            }
+                //3 2 GANG
+            else if (stmp == "GANG") {
+                //需要判断明杠还是暗杠,通过检查GANG前上一次的情况判定
+                sin.clear();
+                sin.str(request[i - 1]);
+                sin >> itmp;
+                //排除暗摸的情况
+                if (itmp == '3') {
+                    sin >> itmp;
+                    if (itmp == playerID) {
+                        sin >> stmp;
+                        if (stmp == "DRAW") {
+                            //暗摸的情况，暂时没想好怎么办
+                            continue;
+                        }
+                    }
+                }
+                stmp = hand[4][hand[4].size() - 1]; //gang的牌
+                if (myPlayerID == playerID) {
+                    for (int k = 0; k < 4; k++) {
+                        hand[myPlayerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
+                    }
+                    gang.push_back(stmp);
+                }
+                else {
+                    for (int k = 0; k < 4; k++) {
+                        hand[playerID].push_back(stmp);
+                    }
+                    hand[4].pop_back();
+                    //gang完以后的摸牌操作看不到
+                }
+            }
+                //3 playerID BUGANG Card1
+            else if (stmp == "BUGANG") {
+                //补杠的牌
+                sin >> stmp;
+                if (playerID == myPlayerID) {
+                    //hand中一张牌即可
+                    hand[playerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
+                    //把peng变成gang
+                    peng.erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
+                    gang.push_back(stmp);
+                }
+                else {
+                    hand[playerID].push_back(stmp);
+                    if(i == turnID)
+                        return stmp;
+                }
+            }
+            else if (stmp == "BUHUA" && playerID == myPlayerID) {
+                flowerCnt++;
+            }
+        }
+    }
+    return "Fail";
+}
+string play_card() {
+    //如果可以听牌还没写，写在这儿
+
+    //F,J落单，就直接扔
+    string fj = FJ();
+    //存在落单的东南西北中发白
+    if (fj != "Fail") {
+        return fj;
+    }
+    else {
+        //从两头向中间除去间隔一个空位的单牌
+        string es = eraseSingle();
+        if (es != "Fail") {
+            return es;
+        }
+        else {
+            string sing = single();
+            if (sing != "Fail") {
+                return sing;
+            }
+        }
+    }
+    //什么都没有return的时候
+    random_shuffle(hand[myPlayerID].begin(), hand[myPlayerID].end());
+    return  *(hand[myPlayerID].rbegin());
+
+}
+
+
+void decision_to_play_card() {
+    //random_shuffle(hand.begin(), hand.end());
+    //sout << "PLAY " << *hand.rbegin();
+    //hand.pop_back();
+    //以上是随机算法
+
+    //判断能不能胡，如果能胡输出HU，并调用算番器
+    bool tmpbool = ifHU(hand[myPlayerID], stmp);
+    if (tmpbool && getFan() >= 8) {
+        sout << "HU";
+    }
+    else {
+        //生成一个自己手中牌的map<string,int>
+        refreshMap(myPlayerID);
+
+        //判断能否杠
+        if (ableGANG(stmp)) {
+            sout << "GANG " << stmp;
+            //把手中GANG的牌删掉
+            hand[myPlayerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
+            string s = play_card();
+            sout << s;
+        }
+        else {
+            string s = play_card();
+            sout << "PLAY " << s;
+        }
+    }
+}
+
+void decision_to_response() {
+    //进这个函数就保证是可以操作的，而不是只能输出PASS
+    sin.clear();
+    sin.str(request[turnID]);
+    sin >> itmp;
+    if (itmp != myPlayerID) {
+        sin >> stmp >> stmp;
+        //如果可以抢牌胡
+        if (ifHU(hand[myPlayerID], stmp)) {
+            sout << "HU";
+        }
+            //可以抢牌杠
+        else if (ableGANG(stmp)) {
+            sout << "GANG";
+        }
+            //可以碰
+        else if (ablePENG(stmp)) {
+            sout << "PENG ";
+            //把PENG的牌处理一下
+            for(int k = 1; k <= 2; k++)
+                hand[myPlayerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
+            peng.push_back(stmp);
+            //更新map
+            refreshMap(myPlayerID);
+            stmp = play_card();
+            sout << stmp;
+        }
+        else if(ableCHI(stmp) != "Fail") {
+            //stmp存了吃的牌的中间的牌
+            hand[myPlayerID].push_back(stmp);//先存进来之后三个一起erase
+            stmp = ableCHI(stmp);
+            //三个erase
+            hand[myPlayerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), previous(stmp)));
+            hand[myPlayerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
+            hand[myPlayerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), post(stmp)));
+            sout << "CHI " << stmp << " ";
+            stmp = play_card();
+            sout << stmp;
+        }
+        else {
+            sout << "PASS";
+        }
+    }
+    else {
+        sout << "PASS";
+    }
+}
 
 
 int main()
 {
-    int turnID;
-    string stmp;
     //初始化hand 0-4是四个玩家，5是桌上的牌
     for (int i = 0; i < 5; i++) {
         vector<string> vtmp;
@@ -475,16 +732,13 @@ int main()
     }
     else {
         //itmp是轮次，myPlayerID，quan是风圈
-        int itmp;
-        ostringstream sout;
-        istringstream sin;
         sin.str(request[0]);
         sin >> itmp >> myPlayerID >> quan;
         sin.clear();
         sin.str(request[1]);
         for (int j = 0; j < 5; j++) {
             sin >> itmp;
-            if (j = myPlayerID + 1) {
+            if (j == myPlayerID + 1) {
                 flowerCnt = itmp;
             }
         }
@@ -492,235 +746,21 @@ int main()
             sin >> stmp;
             hand[myPlayerID].push_back(stmp);
         }
-        for (int i = 2; i <= turnID; i++) {
-            sin.clear();
-            sin.str(request[i]);
-            sin >> itmp;
-            if (itmp == 2) {
-                sin >> stmp;
-                hand[myPlayerID].push_back(stmp);
-                sin.clear();
-                if (i == turnID) {
-                    break;
-                }
-                sin.str(response[i]);
-                sin >> stmp;
-                if (stmp == "PLAY") {
-                    sin >> stmp;
-                    hand[myPlayerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
-                }
-                    //GANG T6 就是暗杠
-                else if (stmp == "GANG") {
-                    sin >> stmp;
-                    for (int k = 0; k < 4; k++) {
-                        hand[myPlayerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
-                    }
-                    gang.push_back(stmp);
-                }
-            }
-                //其他情况
-                //3 playerID BUHUA Card1
-            else if (itmp == 3) {
-                int playerID;
-                sin >> playerID;
-                sin >> stmp;
-                //自己playerID的已经读过了
-                if (stmp == "PLAY" && playerID != myPlayerID) {
-                    sin >> stmp;
-                    hand[4].push_back(stmp);
-                }
-                    //3 playerID PENG Card1
-                else if (stmp == "PENG") {
-                    stmp =  hand[4][hand[4].size() - 1]; //peng的牌
-                    //如果是自己，就需要存peng的情况
-                    if (playerID == myPlayerID) {
-                        //存peng
-                        peng.push_back(stmp);
-                        //hand中删掉这三张牌
-                        for (int k = 0; k < 3; k++) {
-                            hand[myPlayerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
-                        }
-                        //map是最后一起生成的，这里不需要做
-                    }
-                    else {
-                        for (int k = 0; k < 3; k++) {
-                            hand[playerID].push_back(stmp);
-                        }
-                        hand[4].pop_back();
-                        sin >> stmp;
-                        hand[4].push_back(stmp);
-                    }
-                }
-                    //3 playerID CHI Card1 Card2
-                else if (stmp == "CHI") {
-                    sin >> stmp;
-                    if (myPlayerID == playerID) {
-                        //chi里面调整
-                        chi.push_back(stmp);
-                        //hand里面调整
-                        hand[playerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), previous(stmp)));
-                        hand[playerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
-                        hand[playerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), post(stmp)));
-                    }
-                    else {
-                        hand[playerID].push_back(previous(stmp));
-                        hand[playerID].push_back(stmp);
-                        hand[playerID].push_back(post(stmp));
-                    }
-                }
-                    //3 2 GANG
-                else if (stmp == "GANG") {
-                    //需要判断明杠还是暗杠
-                    sin.clear();
-                    sin.str(request[i - 1]);
-                    sin >> stmp;
-                    //排除暗摸的情况
-                    if (itmp == '3') {
-                        sin >> stmp;
-                        if (itmp == playerID) {
-                            sin >> stmp;
-                            if (stmp == "DRAW") {
-                                //暗摸的情况，暂时没想好怎么办
-                                continue;
-                            }
-                        }
-                    }
-                    stmp = hand[4][hand[4].size() - 1]; //gang的牌
-                    if (myPlayerID == playerID) {
-                        for (int k = 0; k < 4; k++) {
-                            hand[myPlayerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
-                        }
-                        gang.push_back(stmp);
-                    }
-                    else {
-                        for (int k = 0; k < 4; k++) {
-                            hand[playerID].push_back(stmp);
-                        }
-                        hand[4].pop_back();
-                        sin >> stmp;
-                        hand[4].push_back(stmp);
-                    }
-                }
-                    //3 playerID BUGANG Card1
-                else if (stmp == "BUGANG") {
-                    //补杠的牌
-                    sin >> stmp;
-                    if (playerID == myPlayerID) {
-                        //hand中一张牌即可
-                        hand[playerID].erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
-                        //把peng变成gang
-                        peng.erase(find(hand[myPlayerID].begin(), hand[myPlayerID].end(), stmp));
-                        gang.push_back(stmp);
-                    }
-                    else {
-                        hand[playerID].push_back(stmp);
-                    }
-                }
-                else if (stmp == "BUHUA" && playerID == myPlayerID) {
-                    flowerCnt++;
-                }
-            }
-        }
+        //如果这局itmp是2，stmp就是我在这局摸到的牌，如果这局itmp是3，只有别的玩家出牌了才会返回出的是什么牌，其他都返回“Fail”
+        stmp = init_position();
         sin.clear();
         sin.str(request[turnID]);
         sin >> itmp;
         //到我的时候，这时stmp就是牌的信息
         if (itmp == 2) {
-            //random_shuffle(hand.begin(), hand.end());
-            //sout << "PLAY " << *hand.rbegin();
-            //hand.pop_back();
-            //以上是随机算法
-
-            //判断能不能胡，如果能胡输出HU，并调用算番器
-            bool tmpbool = ifHU(hand[myPlayerID], stmp);
-            if (tmpbool && getFan() >= 8) {
-                sout << "HU";
-            }
-            else {
-                //生成一个自己手中牌的map<string,int>
-                refreshMap(myPlayerID);
-
-                //判断能否杠
-                if (ableGANG(stmp)) {
-                    sout << "GANG " << stmp;
-                }
-                //W4”表示“四万”，“B6”表示“六筒”，“T8”表示“8条”  “F1”～“F4”表示“东南西北”，“J1”～“J3”表示“中发白”
-                //如果可以听牌
-                //F,J落单，就直接扔
-                string fj = FJ();
-                //存在落单的东南西北中发白
-                if (fj != "Fail") {
-                    sout << "PLAY " << fj;
-                }
-                else {
-                    //从两头向中间除去间隔一个空位的单牌
-                    string es = eraseSingle();
-                    if (es != "Fail") {
-                        sout << "PLAY " << es;
-                    }
-                    else {
-                        string sing = single();
-                        if (sing != "Fail") {
-                            sout << "PLAY " << sing;
-                        }
-                        else {
-                            random_shuffle(hand[myPlayerID].begin(), hand[myPlayerID].end());
-                            sout << "PLAY " << *(hand[myPlayerID].rbegin());
-                        }
-                    }
-                }
-            }
+            decision_to_play_card();
         }
             //3 2 PLAY T1
         else if (itmp == 3) {
-            sin.clear();
-            sin.str(request[turnID]);
-            sin >> itmp;
-            if (itmp != myPlayerID) {
-                sin >> stmp >> stmp;
-                if (ableGANG(stmp)) {
-                    sout << "GANG";
-                }
-                else if (ablePENG(stmp)) {
-                    sout << "PENG ";
-                    refreshMap(myPlayerID);
-
-                    //W4”表示“四万”，“B6”表示“六筒”，“T8”表示“8条”  “F1”～“F4”表示“东南西北”，“J1”～“J3”表示“中发白”
-                    //如果可以听牌
-                    //F,J落单，就直接扔
-                    string fj = FJ();
-                    //存在落单的东南西北中发白
-                    if (fj != "Fail") {
-                        sout << fj;
-                    }
-                    else {
-                        //从两头向中间除去间隔一个空位的单牌
-                        string es = eraseSingle();
-                        if (es != "Fail") {
-                            sout << es;
-                        }
-                        else {
-                            string sing = single();
-                            if (sing != "Fail") {
-                                sout << sing;
-                            }
-                            else {
-                                random_shuffle(hand[myPlayerID].begin(), hand[myPlayerID].end());
-                                sout << *(hand[myPlayerID].rbegin());
-                            }
-                        }
-                    }
-                }
-                else {
-                    sout << "PASS";
-                }
-            }
-            else {
+            if(stmp != "Fail")
+                decision_to_response();
+            else
                 sout << "PASS";
-            }
-        }
-        else {
-            sout << "PASS";
         }
         response.push_back(sout.str());
     }
