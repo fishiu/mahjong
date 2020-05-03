@@ -23,19 +23,19 @@ istringstream str_in;
 //我的手牌，这个变量有问题，不能用
 //vector<string> my_card;
 //我的门风
-int my_player_Id;
+int my_player_id;
 //花牌数量
 int flower_count = 0;
 //圈风
 int quan;
 //当前回合数
-int turn_Id;
+int turn_id;
 string stmp;
 int itmp;
 
 //存输入和输出
 vector<string> request, response;
-//存所有player手中的牌
+//存所有player手中(已知)的牌, all_card[4]是牌桌上已经出出来的牌
 vector<vector<string> > all_card;
 //存手中活动牌 <牌名，此牌数量>
 unordered_map<string, int> my_active_card;
@@ -382,7 +382,7 @@ bool checkHu(vector<string> Cards, string lastCards = "n", string gotCard = "n")
  * @param newCard 新出现的牌（摸来 OR 玩家的牌）
  * @return bool
  */
-string ableCHI(string newCard) {
+string checkChi(string newCard) {
     vector<string> card;
     card = my_card;
     card.push_back(newCard);
@@ -425,7 +425,7 @@ string ableCHI(string newCard) {
  * @param newCard 新出现的牌（摸来 OR 玩家的牌）
  * @return bool
  */
-bool ablePENG(string newCard) {
+bool checkPeng(string newCard) {
     if (my_active_card.find(newCard) == my_active_card.end()) {
         return false;
     } else if (my_active_card[newCard] >= 2) {
@@ -439,7 +439,7 @@ bool ablePENG(string newCard) {
  * @param newCard 新出现的牌（摸来 OR 玩家的牌）
  * @return bool
  */
-bool ableGANG(string newCard) {
+bool checkGang(string newCard) {
     if (my_active_card.find(newCard) == my_active_card.end()) {
         return false;
     } else if (my_active_card[newCard] >= 3) {
@@ -455,7 +455,7 @@ bool ableGANG(string newCard) {
 int getFan() {
     return 10;
     // 随便找个玩家，不是我自己就行
-    int aPlayerId = (my_player_Id + 3) % 4;
+    int aPlayerId = (my_player_id + 3) % 4;
     // 使用前初始化
     void MahjongInit();
     vector<pair<string, pair<string, int> > > pack;
@@ -486,7 +486,7 @@ int getFan() {
     bool isJUEZHANG = 0; //绝张和
     bool isGANG = 0; //杠上开花
     bool isLAST = 0; //排墙最后一张
-    int menFeng = my_player_Id; //门风
+    int menFeng = my_player_id; //门风
     int quanFeng = quan; //圈风
 
     // 算番函数
@@ -513,159 +513,170 @@ int getFan() {
 
 /**
  * 初始化现在的情况
- * @return 摸到的牌
+ * @return 当前回合我摸到的牌
  */
-string init_position() {
-    int itmp;
-    string stmp;
-    //itmp是轮次，myPlayerID，quan是风圈
+string initCondition() {
+    //记录信息的第一个字段：编号
+    int record_type;
+    //暂存牌名
+    string str_tmp;
     str_in.str(request[0]);
-    str_in >> itmp >> my_player_Id >> quan;
+    str_in >> record_type >> my_player_id >> quan;
     str_in.clear();
     str_in.str(request[1]);
     for (int j = 0; j < 5; j++) {
-        str_in >> itmp;
-        if (j == my_player_Id + 1) {
-            flower_count = itmp;
+        str_in >> record_type;
+        if (j == my_player_id + 1) {
+            flower_count = record_type;
         }
     }
     for (int j = 0; j < 13; j++) {
-        str_in >> stmp;
-        all_card[my_player_Id].push_back(stmp);
+        str_in >> str_tmp;
+        all_card[my_player_id].push_back(str_tmp);
     }
-    for (int i = 2; i <= turn_Id; i++) {
+    for (int i = 2; i <= turn_id; i++) {
+        //读（过去）的输入
         str_in.clear();
         str_in.str(request[i]);
-        str_in >> itmp;
-        if (itmp == 2) {
-            str_in >> stmp;
-            all_card[my_player_Id].push_back(stmp);
+        str_in >> record_type;
+
+        if (record_type == 2) { //我自己摸牌
+            str_in >> str_tmp;
+            all_card[my_player_id].push_back(str_tmp);
             str_in.clear();
-            if (i == turn_Id) {
-                //return 在这里
-                return stmp;
+            if (i == turn_id) {
+                // 返回我摸到的牌
+                return str_tmp;
             }
+
+            //读（我过去的）输出
             str_in.str(response[i]);
-            str_in >> stmp;
-            if (stmp == "PLAY") {
-                str_in >> stmp;
-                all_card[my_player_Id].erase(find(all_card[my_player_Id].begin(), all_card[my_player_Id].end(), stmp));
+            str_in >> str_tmp;
+            if (str_tmp == "PLAY") {
+                str_in >> str_tmp;
+                all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
             }
-                //GANG T6 就是暗杠
-            else if (stmp == "GANG") {
-                str_in >> stmp;
+            else if (str_tmp == "GANG") { //GANG T6 就是暗杠
+                str_in >> str_tmp;
                 for (int k = 0; k < 4; k++) {
-                    all_card[my_player_Id].erase(find(all_card[my_player_Id].begin(), all_card[my_player_Id].end(), stmp));
+                    all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
                 }
-                gang.push_back(stmp);
+                gang.push_back(str_tmp);
             }
         }
-            //其他情况
-            //3 playerID BUHUA Card1
-        else if (itmp == 3) {
-            int playerID;
-            str_in >> playerID;
-            str_in >> stmp;
-            //自己playerID的已经读过了
-            if (stmp == "PLAY" && playerID != my_player_Id) {
-                str_in >> stmp;
-                all_card[4].push_back(stmp);
-                if (i == turn_Id) {
+
+        //其他玩家的操作信息比如 3 playerID BUHUA Card1
+        else if (record_type == 3) {
+
+            int player_id;
+            str_in >> player_id;
+            str_in >> str_tmp;
+
+            //处理出牌操作，自己的已经处理过了
+            if (str_tmp == "PLAY" && player_id != my_player_id) {
+                str_in >> str_tmp;
+                //其他玩家出的牌要存在all_card[4]
+                all_card[4].push_back(str_tmp);
+                if (i == turn_id) {
                     //返回值在这儿
-                    return stmp;
+                    return str_tmp;
                 }
             }
-                //3 playerID PENG Card1
-            else if (stmp == "PENG") {
-                stmp = all_card[4][all_card[4].size() - 1]; //peng的牌
+
+            //处理PENG操作 3 playerID PENG Card1
+            else if (str_tmp == "PENG") {
+                str_tmp = all_card[4][all_card[4].size() - 1]; //peng的牌
                 //如果是自己，就需要存peng的情况
-                if (playerID == my_player_Id) {
+                if (player_id == my_player_id) {
                     //存peng
-                    peng.push_back(stmp);
-                    //hand中删掉这三张牌
+                    peng.push_back(str_tmp);
+                    //all_card中删掉这三张牌
                     for (int k = 0; k < 3; k++) {
-                        all_card[my_player_Id].erase(find(all_card[my_player_Id].begin(), all_card[my_player_Id].end(), stmp));
+                        all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
                     }
                     //map是最后一起生成的，这里不需要做
                 } else {
                     for (int k = 0; k < 3; k++) {
-                        all_card[playerID].push_back(stmp);
+                        all_card[player_id].push_back(str_tmp);
                     }
                     all_card[4].pop_back();
-                    str_in >> stmp;
-                    all_card[4].push_back(stmp);
-                    if (turn_Id == i) {
-                        return stmp;
+                    str_in >> str_tmp;
+                    all_card[4].push_back(str_tmp);
+                    if (turn_id == i) {
+                        return str_tmp;
                     }
                 }
             }
-                //3 playerID CHI Card1 Card2
-            else if (stmp == "CHI") {
-                str_in >> stmp;
-                if (my_player_Id == playerID) {
+
+            //处理CHI操作 3 playerID CHI Card1 Card2
+            else if (str_tmp == "CHI") {
+                str_in >> str_tmp;
+                if (my_player_id == player_id) {
                     //chi里面调整
-                    chi.push_back(stmp);
+                    chi.push_back(str_tmp);
                     //hand里面调整
-                    all_card[playerID].erase(
-                            find(all_card[my_player_Id].begin(), all_card[my_player_Id].end(), previousCard(stmp)));
-                    all_card[playerID].erase(find(all_card[my_player_Id].begin(), all_card[my_player_Id].end(), stmp));
-                    all_card[playerID].erase(find(all_card[my_player_Id].begin(), all_card[my_player_Id].end(), postCard(stmp)));
+                    all_card[player_id].erase(
+                            find(all_card[my_player_id].begin(), all_card[my_player_id].end(), previousCard(str_tmp)));
+                    all_card[player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
+                    all_card[player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), postCard(str_tmp)));
                 } else {
-                    all_card[playerID].push_back(previousCard(stmp));
-                    all_card[playerID].push_back(stmp);
-                    all_card[playerID].push_back(postCard(stmp));
-                    if (i == turn_Id) {
-                        return stmp;
+                    all_card[player_id].push_back(previousCard(str_tmp));
+                    all_card[player_id].push_back(str_tmp);
+                    all_card[player_id].push_back(postCard(str_tmp));
+                    if (i == turn_id) {
+                        return str_tmp;
                     }
                 }
             }
-                //3 2 GANG
-            else if (stmp == "GANG") {
+
+            //处理GANG操作 3 playerID GANG
+            else if (str_tmp == "GANG") {
                 //需要判断明杠还是暗杠,通过检查GANG前上一次的情况判定
                 str_in.clear();
                 str_in.str(request[i - 1]);
-                str_in >> itmp;
+                str_in >> record_type;
                 //排除暗摸的情况
-                if (itmp == '3') {
-                    str_in >> itmp;
-                    if (itmp == playerID) {
-                        str_in >> stmp;
-                        if (stmp == "DRAW") {
+                if (record_type == 3) {
+                    str_in >> record_type;
+                    if (record_type == player_id) {
+                        str_in >> str_tmp;
+                        if (str_tmp == "DRAW") {
                             //暗摸的情况，暂时没想好怎么办
                             continue;
                         }
                     }
                 }
-                stmp = all_card[4][all_card[4].size() - 1]; //gang的牌
-                if (my_player_Id == playerID) {
+                str_tmp = all_card[4][all_card[4].size() - 1]; //gang的牌
+                if (my_player_id == player_id) {
                     for (int k = 0; k < 4; k++) {
-                        all_card[my_player_Id].erase(find(all_card[my_player_Id].begin(), all_card[my_player_Id].end(), stmp));
+                        all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
                     }
-                    gang.push_back(stmp);
+                    gang.push_back(str_tmp);
                 } else {
                     for (int k = 0; k < 4; k++) {
-                        all_card[playerID].push_back(stmp);
+                        all_card[player_id].push_back(str_tmp);
                     }
                     all_card[4].pop_back();
                     //gang完以后的摸牌操作看不到
                 }
             }
-                //3 playerID BUGANG Card1
-            else if (stmp == "BUGANG") {
+
+            //处理BUGANG操作 3 playerID BUGANG Card1
+            else if (str_tmp == "BUGANG") {
                 //补杠的牌
-                str_in >> stmp;
-                if (playerID == my_player_Id) {
+                str_in >> str_tmp;
+                if (player_id == my_player_id) {
                     //hand中一张牌即可
-                    all_card[playerID].erase(find(all_card[my_player_Id].begin(), all_card[my_player_Id].end(), stmp));
+                    all_card[player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
                     //把peng变成gang
-                    peng.erase(find(all_card[my_player_Id].begin(), all_card[my_player_Id].end(), stmp));
-                    gang.push_back(stmp);
+                    peng.erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
+                    gang.push_back(str_tmp);
                 } else {
-                    all_card[playerID].push_back(stmp);
-                    if (i == turn_Id)
-                        return stmp;
+                    all_card[player_id].push_back(str_tmp);
+                    if (i == turn_id)
+                        return str_tmp;
                 }
-            } else if (stmp == "BUHUA" && playerID == my_player_Id) {
+            } else if (str_tmp == "BUHUA" && player_id == my_player_id) {
                 flower_count++;
             }
         }
@@ -674,10 +685,10 @@ string init_position() {
 }
 
 /**
- * 出牌
- * @return 要出的牌
+ * 挑选一张最适合出牌的牌
+ * @return 最优的牌
  */
-string play_card() {
+string getBestCard() {
     //如果可以听牌还没写，写在这儿
 
     //F,J落单，就直接扔
@@ -698,82 +709,84 @@ string play_card() {
         }
     }
     //什么都没有return的时候
-    return *(all_card[my_player_Id].rbegin());
+    return *(all_card[my_player_id].rbegin());
 
 }
 
 /**
- * 我还没看懂这在干啥
+ * 轮到我出牌
  */
-void decision_to_play_card() {
-    //random_shuffle(hand.begin(), hand.end());
-    //sout << "PLAY " << *hand.rbegin();
-    //hand.pop_back();
+void playCard() {
+    /*
+     random_shuffle(all_card.begin(), all_card.end());
+     str_out << "PLAY " << *all_card.rbegin();
+     hand.pop_back();
+     */
     //以上是随机算法
 
     //判断能不能胡，如果能胡输出HU，并调用算番器
-    bool tmpbool = checkHu(all_card[my_player_Id], stmp);
+    bool tmpbool = checkHu(all_card[my_player_id], stmp);
     if (tmpbool && getFan() >= 8) {
         str_out << "HU";
     } else {
-        all_card[my_player_Id].erase(find(all_card[my_player_Id].begin(), all_card[my_player_Id].end(), stmp));
+        all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
         //生成一个自己手中牌的map<string,int>
-        setMyCard(my_player_Id);
+        setMyCard(my_player_id);
         //判断能否杠
-        if (ableGANG(stmp)) {
-            all_card[my_player_Id].push_back(stmp);
+        if (checkGang(stmp)) {
+            all_card[my_player_id].push_back(stmp);
             str_out << "GANG " << stmp;
             //这里是暗杠，还没处理
             //把手中GANG的牌删掉
-            all_card[my_player_Id].erase(find(all_card[my_player_Id].begin(), all_card[my_player_Id].end(), stmp));
+            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
         } else {
-            all_card[my_player_Id].push_back(stmp);
-            setMyCard(my_player_Id);
-            string s = play_card();
+            all_card[my_player_id].push_back(stmp);
+            setMyCard(my_player_id);
+            string s = getBestCard();
             str_out << "PLAY " << s;
         }
     }
 }
 
 /**
- * 这个函数我也不知道在干嘛
+ * 不是我出牌的Turn时进行决策
  */
-void decision_to_response() {
+void responseOutTurn() {
     //进这个函数就保证是可以操作的，而不是只能输出PASS
     str_in.clear();
-    str_in.str(request[turn_Id]);
+    str_in.str(request[turn_id]);
     str_in >> itmp;
-    if (itmp != my_player_Id) {
+    if (itmp != my_player_id) {
         str_in >> stmp >> stmp;
         //如果可以抢牌胡
-        if (checkHu(all_card[my_player_Id], stmp)) {
+        if (checkHu(all_card[my_player_id], stmp)) {
             str_out << "HU";
         }
             //可以抢牌杠
-        else if (ableGANG(stmp)) {
+        else if (checkGang(stmp)) {
             str_out << "GANG";
         }
             //可以碰
-        else if (ablePENG(stmp)) {
+        else if (checkPeng(stmp)) {
             str_out << "PENG ";
             //把PENG的牌处理一下
             for (int k = 1; k <= 2; k++)
-                all_card[my_player_Id].erase(find(all_card[my_player_Id].begin(), all_card[my_player_Id].end(), stmp));
+                all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
             peng.push_back(stmp);
             //更新map
-            setMyCard(my_player_Id);
-            stmp = play_card();
+            setMyCard(my_player_id);
+            stmp = getBestCard();
             str_out << stmp;
-        } else if (ableCHI(stmp) != "Fail") {
+        } else if (checkChi(stmp) != "Fail") {
             //stmp存了吃的牌的中间的牌
-            all_card[my_player_Id].push_back(stmp);//先存进来之后三个一起erase
-            stmp = ableCHI(stmp);
+            all_card[my_player_id].push_back(stmp);//先存进来之后三个一起erase
+            stmp = checkChi(stmp);
             //三个erase
-            all_card[my_player_Id].erase(find(all_card[my_player_Id].begin(), all_card[my_player_Id].end(), previousCard(stmp)));
-            all_card[my_player_Id].erase(find(all_card[my_player_Id].begin(), all_card[my_player_Id].end(), stmp));
-            all_card[my_player_Id].erase(find(all_card[my_player_Id].begin(), all_card[my_player_Id].end(), postCard(stmp)));
+            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), previousCard(stmp)));
+            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
+            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), postCard(stmp)));
             str_out << "CHI " << stmp << " ";
-            stmp = play_card();
+            stmp = getBestCard();
             str_out << stmp;
         } else {
             str_out << "PASS";
@@ -792,31 +805,31 @@ int main() {
     }
 
     //Json交互的输入（删掉了普通交互）
-    Json::Value inputJSON;
-    cin >> inputJSON;
-    //记录当前回合数（responses的数量）
-    turn_Id = inputJSON["responses"].size();
+    Json::Value input_json;
+    cin >> input_json;
+    //当前回合的下标（即总共回合数量-1）
+    turn_id = input_json["responses"].size();
     //读取交互信息，存入request和response
-    for (int i = 0; i < turn_Id; i++) {
-        request.push_back(inputJSON["requests"][i].asString());
-        response.push_back(inputJSON["responses"][i].asString());
+    for (int i = 0; i < turn_id; i++) {
+        request.push_back(input_json["requests"][i].asString());
+        response.push_back(input_json["responses"][i].asString());
     }
-    request.push_back(inputJSON["requests"][turn_Id].asString());
+    request.push_back(input_json["requests"][turn_id].asString());
 
-    if (turn_Id < 2) { //如果当前回合数是1或0
+    if (turn_id < 2) { //如果当前回合数是1或0
         response.push_back("PASS");
     } else { //如果这局itmp是2，stmp就是我在这局摸到的牌，如果这局itmp是3，只有别的玩家出牌了才会返回出的是什么牌，其他都返回“Fail”
-        stmp = init_position();
+        stmp = initCondition();
         str_in.clear();
-        str_in.str(request[turn_Id]);
+        str_in.str(request[turn_id]);
         str_in >> itmp;
         if (itmp == 2) { //到我的时候，这时stmp就是牌的信息
-            decision_to_play_card();
+            playCard();
         }
         //3 2 PLAY T1
         else if (itmp == 3) {
             if (stmp != "Fail")
-                decision_to_response();
+                responseOutTurn();
             else
                 str_out << "PASS";
         }
@@ -825,7 +838,7 @@ int main() {
 
     //Json交互的输出（删掉了普通交互）
     Json::Value outputJSON;
-    outputJSON["response"] = response[turn_Id];
+    outputJSON["response"] = response[turn_id];
     cout << outputJSON << endl;
     return 0;
 }
