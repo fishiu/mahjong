@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
-//#include "MahjongGB/MahjongGB.h"
+#include "MahjongGB/MahjongGB.h"
 
 #ifdef _BOTZONE_ONLINE
 #include "jsoncpp/json.h"
