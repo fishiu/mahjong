@@ -10,13 +10,8 @@
 #ifdef _BOTZONE_ONLINE
 #include "jsoncpp/json.h"
 #else
-
 #include "json/json.h"
-
 #endif
-
-#define SIMPLEIO 0
-//由玩家自己定义，0表示JSON交互，1表示简单交互。
 
 using namespace std;
 
@@ -795,19 +790,8 @@ int main() {
         vector<string> vtmp;
         all_card.push_back(vtmp);
     }
-#if SIMPLEIO
-    cin >> turn_Id;
-    turn_Id--;
-    getline(cin, stmp);
-    for (int i = 0; i < turn_Id; i++) {
-        getline(cin, stmp);
-        request.push_back(stmp);
-        getline(cin, stmp);
-        response.push_back(stmp);
-    }
-    getline(cin, stmp);
-    request.push_back(stmp);
-#else
+
+    //Json交互的输入（删掉了普通交互）
     Json::Value inputJSON;
     cin >> inputJSON;
     //记录当前回合数（responses的数量）
@@ -818,7 +802,6 @@ int main() {
         response.push_back(inputJSON["responses"][i].asString());
     }
     request.push_back(inputJSON["requests"][turn_Id].asString());
-#endif
 
     if (turn_Id < 2) { //如果当前回合数是1或0
         response.push_back("PASS");
@@ -840,12 +823,9 @@ int main() {
         response.push_back(str_out.str());
     }
 
-#if SIMPLEIO
-    cout << response[turn_Id] << endl;
-#else
+    //Json交互的输出（删掉了普通交互）
     Json::Value outputJSON;
     outputJSON["response"] = response[turn_Id];
     cout << outputJSON << endl;
-#endif
     return 0;
 }
