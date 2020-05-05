@@ -669,7 +669,7 @@ string initCondition() {
                     //hand中一张牌即可
                     all_card[player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
                     //把peng变成gang
-                    peng.erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
+                    peng.erase(find(peng.begin(), peng.end(), str_tmp));
                     gang.push_back(str_tmp);
                 } else {
                     all_card[player_id].push_back(str_tmp);
@@ -724,12 +724,14 @@ void playCard() {
      */
     //以上是随机算法
 
+	//这里这个 erase 是针对initCondition作出的调整 因为下面的判断胡的函数和判断杠的函数都默认手牌是13张（不包括新摸的牌）
+	all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
     //判断能不能胡，如果能胡输出HU，并调用算番器
     bool tmpbool = checkHu(all_card[my_player_id], stmp);
     if (tmpbool && getFan() >= 8) {
         str_out << "HU";
     } else {
-        all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
+		//这里是原erase的位置
         //生成一个自己手中牌的map<string,int>
         setMyCard(my_player_id);
         //判断能否杠
@@ -798,7 +800,7 @@ void responseOutTurn() {
 
 
 int main() {
-    //初始化all_card 0-4是四个玩家，5是桌上的牌
+    //初始化all_card 0-3是四个玩家，4是桌上的牌
     for (int i = 0; i < 5; i++) {
         vector<string> vtmp;
         all_card.push_back(vtmp);
