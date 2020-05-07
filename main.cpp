@@ -26,10 +26,13 @@ istringstream str_in;
 int my_player_id;
 //花牌数量
 int flower_count = 0;
+//记录除去花牌之外所有的牌
+int not_flower_count = 0;
 //圈风
 int quan;
-//当前回合数
+//当前回合数的下标（如果turn_id是5，那么一共有6个request和5个response）有点坑
 int turn_id;
+
 string stmp;
 int itmp;
 
@@ -453,7 +456,7 @@ bool checkGang(string newCard) {
 /**
  * 判断是否是绝张胡
  * 逐个判断每一张手牌是不是绝张（桌上已经有了三张）
- * @return
+ * @return true 确实绝张胡，false 不是绝张胡
  */
 bool isJueZhang() {
     for(auto& i : my_active_card) {
@@ -501,10 +504,10 @@ int getFan() {
         myMapIter++;
     }
     string winTile = my_active_card.end()->first; //"W5"
-    bool is_ZIMO; //是否是自摸
+    bool is_ZIMO = itmp == 2; //是否是自摸
     bool is_JUEZHANG = isJueZhang(); //绝张和
     bool is_GANG = 0; //杠上开花
-    bool is_LAST = 0; //排墙最后一张
+    bool is_LAST = (flower_count + not_flower_count >= 144); //排墙最后一张
     int MEN_FENG = my_player_id; //门风
     int quanFeng = quan; //圈风
 
@@ -562,6 +565,7 @@ string initCondition() {
         if (record_type == 2) { //我自己摸牌
             str_in >> str_tmp;
             all_card[my_player_id].push_back(str_tmp);
+            not_flower_count++;
             str_in.clear();
             if (i == turn_id) {
                 // 返回我摸到的牌
@@ -660,8 +664,8 @@ string initCondition() {
                     if (record_type == player_id) {
                         str_in >> str_tmp;
                         if (str_tmp == "DRAW") {
-                            //暗摸的情况，暂时没想好怎么办
-                            continue;
+                            //todo 暗摸的情况，暂时没想好怎么办
+                            not_flower_count++;
                         }
                     }
                 }
@@ -780,7 +784,7 @@ void responseOutTurn() {
     if (itmp != my_player_id) {
         str_in >> stmp >> stmp;
         //如果可以抢牌胡
-        if (checkHu(all_card[my_player_id], stmp)) {
+        if (checkHu(all_card[my_player_id], stmp) && getFan() >= 8) {
             str_out << "HU";
         }
             //可以抢牌杠
