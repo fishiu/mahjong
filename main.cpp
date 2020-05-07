@@ -40,8 +40,15 @@ int itmp;
 vector<string> request, response;
 //存所有player手中(已知)的牌, all_card[4]是牌桌上已经出出来的牌
 vector<vector<string> > all_card;
+//存当前回合"活动牌"，用来记录initCondition的返回值，主要用于算番器的winTile参数
+string current_card;
 //存手中活动牌 <牌名，此牌数量>
 unordered_map<string, int> my_active_card;
+//存我所有的吃碰杠 <类型，<牌名，具体情况>>
+//吃：<CHI，<B2，2>> 表示 B1 B2 B3 第三个int：第i张牌是从上家吃来的
+//碰：<PENG，<B2，2>> 表示 B2 B2 B2 第三个int：碰的牌是玩家i出的
+//杠：<GANG，<B2，2>> 表示 B2 B2 B2 B2 第三个int：杠的牌是玩家i出的
+vector<pair<string, pair<string, int> > > my_pack;
 //存PENG完的牌
 vector<string> peng;
 //存CHI完的牌
@@ -90,6 +97,17 @@ string postCard(string card_name) {
     tmp_string[1] = tmp;
     string s1 = string(tmp_string);
     return s1;
+}
+
+/**
+ * 生成吃碰杠组合
+ * @param type CHI/PENG/GANG
+ * @param card_name 牌名
+ * @param detail 对于吃：第几张牌是吃来的，对于碰杠：牌是谁供的
+ * @return 返回pack
+ */
+pair<string, pair<string, int> > makePack(string type, string card_name, int detail) {
+    return make_pair(type, make_pair(card_name, detail));
 }
 
 /**
@@ -472,25 +490,34 @@ bool isJueZhang() {
 }
 
 /**
+ * 算番器里的pack中的int是玩家的位置而不是id
+ * @param player_id 要计算的玩家
+ * @return 相对自己的位置 0自己 上家 2对家 3下家
+ */
+int player_id_to_position(int _player_id) {
+    switch ((_player_id + 4 - my_player_id) % 4) {
+        case 0: //自己
+            return 0;
+        case 1: //下家
+            return 3;
+        case 2: //对家
+            return 2;
+        case 3: //上家
+            return 1;
+    }
+}
+
+/**
  * 算番器
  * @return 番数
  */
 int getFan() {
-    return 10;
-    // 随便找个玩家，不是我自己就行
-    int aPlayerId = (my_player_id + 3) % 4;
-    // 使用前初始化
-    void MahjongInit();
     vector<pair<string, pair<string, int> > > pack;
     //计算pack
-    for (int i = 0; i < peng.size(); ++i) {
-        pack.push_back(make_pair("PENG", make_pair(peng[i], aPlayerId)));
-    }
-    for (int i = 0; i < chi.size(); ++i) {
-        pack.push_back(make_pair("CHI", make_pair(chi[i], aPlayerId)));
-    }
-    for (int i = 0; i < gang.size(); ++i) {
-        pack.push_back(make_pair("GANG", make_pair(gang[i], aPlayerId)));
+    for (int i = 0; i < my_pack.size(); ++i) {
+        pair<string, pair<string, int> > _pack = my_pack[i];
+        _pack.second.second = player_id_to_position(my_pack[i].second.second);
+        pack.push_back(_pack);
     }
 
     //为了区别全局的hand，前面加上fan
@@ -503,8 +530,7 @@ int getFan() {
         }
         myMapIter++;
     }
-    string winTile = my_active_card.end()->first; //"W5"
-    bool is_ZIMO = itmp == 2; //是否是自摸
+    bool is_ZIMO = (itmp == 2); //是否是自摸
     bool is_JUEZHANG = isJueZhang(); //绝张和
     bool is_GANG = 0; //杠上开花
     bool is_LAST = (flower_count + not_flower_count >= 144); //排墙最后一张
@@ -515,7 +541,7 @@ int getFan() {
     vector<pair<int, string> > res = MahjongFanCalculator(
             pack,
             fan_hand,
-            winTile,
+            current_card,
             flower_count,
             is_ZIMO,
             is_JUEZHANG,
@@ -845,6 +871,7 @@ int main() {
         response.push_back("PASS");
     } else { //如果这局itmp是2，stmp就是我在这局摸到的牌，如果这局itmp是3，只有别的玩家出牌了才会返回出的是什么牌，其他都返回“Fail”
         stmp = initCondition();
+        current_card = stmp;
         str_in.clear();
         str_in.str(request[turn_id]);
         str_in >> itmp;
