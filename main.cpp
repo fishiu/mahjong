@@ -448,6 +448,26 @@ bool checkGang(string newCard) {
     return false;
 }
 
+//下面是一些用来辅助判断番数的函数
+
+/**
+ * 判断是否是绝张胡
+ * 逐个判断每一张手牌是不是绝张（桌上已经有了三张）
+ * @return
+ */
+bool isJueZhang() {
+    for(auto& i : my_active_card) {
+        string _card = i.first;
+        int cnt = 0;
+        for (int j = 0; j < all_card[4].size(); ++j)
+            if (all_card[4][j] == _card)
+                cnt++;
+        if (i.second > 0 && cnt == 3)
+            return true;
+    }
+    return false;
+}
+
 /**
  * 算番器
  * @return 番数
@@ -481,12 +501,11 @@ int getFan() {
         myMapIter++;
     }
     string winTile = my_active_card.end()->first; //"W5"
-    int flowerCount = flower_count; //花牌数量
-    bool isZIMO; //是否是自摸
-    bool isJUEZHANG = 0; //绝张和
-    bool isGANG = 0; //杠上开花
-    bool isLAST = 0; //排墙最后一张
-    int menFeng = my_player_id; //门风
+    bool is_ZIMO; //是否是自摸
+    bool is_JUEZHANG = isJueZhang(); //绝张和
+    bool is_GANG = 0; //杠上开花
+    bool is_LAST = 0; //排墙最后一张
+    int MEN_FENG = my_player_id; //门风
     int quanFeng = quan; //圈风
 
     // 算番函数
@@ -494,12 +513,12 @@ int getFan() {
             pack,
             fan_hand,
             winTile,
-            flowerCount,
-            isZIMO,
-            isJUEZHANG,
-            isGANG,
-            isLAST,
-            menFeng,
+            flower_count,
+            is_ZIMO,
+            is_JUEZHANG,
+            is_GANG,
+            is_LAST,
+            MEN_FENG,
             quanFeng);
 
     // 记录番数的和
@@ -513,7 +532,7 @@ int getFan() {
 
 /**
  * 初始化现在的情况
- * @return 当前回合我摸到的牌
+ * @return 当前回合相关牌（摸到的牌，出的牌）
  */
 string initCondition() {
     //记录信息的第一个字段：编号
