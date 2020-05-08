@@ -76,9 +76,6 @@ int getCardNumAll(string card_name) {
 	return _cnt;
 }
 
-
-
-
 /**
  * 快速生成牌名，注意是char
  * @param type 'W'
@@ -525,41 +522,41 @@ string single() {
  * @return bool
  */
 string checkChi(string newCard) {
-	vector<string> card;
-	card = my_card;
-	card.push_back(newCard);
-	sort(card.begin(), card.end());
-	vector<string>::iterator itr;
-	itr = find(card.begin(), card.end(), newCard);
-	string str_1 = "N";
-	string str_2 = "N";
-	string str1 = "N";
-	string str2 = "N";
-	if (itr != card.begin()) str_1 = *(itr - 1);
+    vector<string> card;
+    card = all_card[my_player_id];
+    card.push_back(newCard);
+    sort(card.begin(), card.end());
+    vector<string>::iterator itr;
+    itr = find(card.begin(), card.end(), newCard);
+    string str_1 = "N";
+    string str_2 = "N";
+    string str1 = "N";
+    string str2 = "N";
+    if (itr != card.begin()) str_1 = *(itr - 1);
 
-	if (itr - 1 != card.begin()) { str_2 = *(itr - 2); }
-	//itr++; itr++;
-	string str0 = *(itr);
-	if (itr + 1 < card.end()) str1 = *(itr + 1);
-	//itr++; itr++;
-	if (itr + 2 < card.end()) str2 = *(itr + 2);
+    if (itr - 1 != card.begin()) { str_2 = *(itr - 2); }
+    //itr++; itr++;
+    string str0 = *(itr);
+    if (itr + 1 < card.end()) str1 = *(itr + 1);
+    //itr++; itr++;
+    if (itr + 2 < card.end()) str2 = *(itr + 2);
 
-	if (str_1[0] == newCard[0] && str_2[0] == newCard[0]) {
-		if (newCard[1] - str_1[1] == 1 && str_1[1] - str_2[1] == 1) {
-			return str_1;
-		}
-	}
-	if (str1[0] == newCard[0] && str2[0] == newCard[0]) {
-		if (newCard[1] - str1[1] == -1 && str1[1] - str2[1] == -1) {
-			return str1;
-		}
-	}
-	if (str_1[0] == newCard[0] && str1[0] == newCard[0]) {
-		if (newCard[1] - str_1[1] == 1 && str1[1] - newCard[1] == 1) {
-			return newCard;
-		}
-	}
-	return "Fail";
+    if (str_1[0] == newCard[0] && str_2[0] == newCard[0]) {
+        if (newCard[1] - str_1[1] == 1 && str_1[1] - str_2[1] == 1) {
+            return str_1;
+        }
+    }
+    if (str1[0] == newCard[0] && str2[0] == newCard[0]) {
+        if (newCard[1] - str1[1] == -1 && str1[1] - str2[1] == -1) {
+            return str1;
+        }
+    }
+    if (str_1[0] == newCard[0] && str1[0] == newCard[0]) {
+        if (newCard[1] - str_1[1] == 1 && str1[1] - newCard[1] == 1) {
+            return newCard;
+        }
+    }
+    return "Fail";
 }
 
 /**
@@ -802,46 +799,45 @@ string initCondition() {
 					str_in.str(request[i - 1]);
 					str_in >> str_temp2 >> str_temp2 >> str_temp2;
 					//CHI操作打出的牌是第五个string
-					if (!strcmp(str_temp2, "CHI")) {
+					if (!strcmp(str_temp2.c_str(), "CHI")) {
 						str_in >> str_temp2 >> str_temp2;
 					}
 					//其他操作 打出的牌是第四个string
 					else str_in >> str_temp2;
-					if (!strcmp(str_temp2, previousCard(str_tmp)) {
+					if (!strcmp(str_temp2.c_str(), previousCard(str_tmp).c_str())) {
 						Chi_position = 1;
 					}
-					else if (!strcmp(str_temp2, postCard(str_tmp)) {
+					else if (!strcmp(str_temp2.c_str(), postCard(str_tmp).c_str())) {
 						Chi_position = 3;
 					}
-					else if (!strcmp(str_temp2, str_tmp)) {
+					else if (!strcmp(str_temp2.c_str(), str_tmp.c_str())) {
 						Chi_position = 2;
 					}
-					my_pack.push_back(makePack("CHI", str_temp, Chi_position));
-						//hand里面调整
-						all_card[player_id].erase(
-							find(all_card[my_player_id].begin(), all_card[my_player_id].end(), previousCard(str_tmp)));
-						all_card[player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
-						all_card[player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), postCard(str_tmp)));
-				}
-				else {
-					all_card[player_id].push_back(previousCard(str_tmp));
-					all_card[player_id].push_back(str_tmp);
-					all_card[player_id].push_back(postCard(str_tmp));
-					if (i == turn_id) {
-						return str_tmp;
-					}
-				}
-			}
+					my_pack.push_back(makePack("CHI",str_tmp,Chi_position));
+                    //hand里面调整
+                    all_card[player_id].erase(
+                            find(all_card[my_player_id].begin(), all_card[my_player_id].end(), previousCard(str_tmp)));
+                    all_card[player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
+                    all_card[player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), postCard(str_tmp)));
+                } else {
+                    all_card[player_id].push_back(previousCard(str_tmp));
+                    all_card[player_id].push_back(str_tmp);
+                    all_card[player_id].push_back(postCard(str_tmp));
+                    if (i == turn_id) {
+                        return str_tmp;
+                    }
+                }
+            }
 
-			//处理GANG操作 3 playerID GANG
-			else if (str_tmp == "GANG") {
-				//需要判断明杠还是暗杠,通过检查GANG前上一次的情况判定
-				str_in.clear();
-				str_in.str(request[i - 1]);
-				str_in >> record_type;
-
-				//暗杠的情况 上回合是自己摸排
-				if (record_type == 2) {
+            //处理GANG操作 3 playerID GANG
+            else if (str_tmp == "GANG") {
+                //需要判断明杠还是暗杠,通过检查GANG前上一次的情况判定
+                str_in.clear();
+                str_in.str(request[i - 1]);
+                str_in >> record_type;
+				
+                //暗杠的情况 上回合是自己摸排
+                if (record_type == 2) {
 					for (int k = 0; k < 4; k++) {
 						all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
 					}
@@ -942,6 +938,22 @@ bool adjacent_card(string card1, string card2) {
 }
 
 
+/**
+ * 获取牌堆中剩下的牌
+ */
+void setRestCard() {
+    for (int i = 0; i <= 9; i++) {
+        rest_card[makeCardName('W', i)] = getCardNumAll(makeCardName('W', i));
+        rest_card[makeCardName('B', i)] = getCardNumAll(makeCardName('B', i));
+        rest_card[makeCardName('T', i)] = getCardNumAll(makeCardName('T', i));
+    }
+    for (int i = 0; i < 4; i++) {
+        rest_card[makeCardName('F', i)] = getCardNumAll(makeCardName('F', i));
+    }
+    for (int i = 0; i < 3; i++) {
+        rest_card[makeCardName('J', i)] = getCardNumAll(makeCardName('J', i));
+    }
+}
 
 /**
  * 挑选一张最适合出牌的牌
@@ -1041,7 +1053,7 @@ string getBestCard() {
 		//去除连续牌数为4、7、10、13中的一张牌，让牌型成为无将胡牌型。如2344条，去除4条。
 		//四条可能是1111，211，22，22就不处理
 		if (interval == 4) {
-			map<string, int> tmp_map = easy_make_map(&(all_card[my_player_id][continue_sum_index[i - 1]]), &(all_card[my_player_id] + continue_sum_index[i - 1]));
+			map<string, int> tmp_map = easy_make_map(&(all_card[my_player_id][continue_sum_index[i - 1]]), &(all_card[my_player_id][continue_sum_index[i]]));
 			if (tmp_map.size() == 4) {
 				return all_card[my_player_id][continue_sum_index[i - 1]];
 			}
@@ -1151,30 +1163,27 @@ void responseOutTurn() {
 			str_in.str(request[turn_id - 1]);
 			str_in >> pre_Playerid >> pre_Playerid;
 			my_pack.push_back(makePack("PENG", stmp, pre_Playerid));
-			//更新map
-			setMyCard(my_player_id);
-			stmp = getBestCard();
-			str_out << stmp;
-		}
-		else if (checkChi(stmp) != "Fail") {
-			//stmp存了吃的牌的中间的牌
-			all_card[my_player_id].push_back(stmp);//先存进来之后三个一起erase
-			stmp = checkChi(stmp);
-			//三个erase
-			all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), previousCard(stmp)));
-			all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
-			all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), postCard(stmp)));
-			str_out << "CHI " << stmp << " ";
-			stmp = getBestCard();
-			str_out << stmp;
-		}
-		else {
-			str_out << "PASS";
-		}
-	}
-	else {
-		str_out << "PASS";
-	}
+            //更新map
+            setMyCard(my_player_id);
+            stmp = getBestCard();
+            str_out << stmp;
+        } else if (checkChi(stmp) != "Fail") {
+            //stmp存了吃的牌的中间的牌
+            all_card[my_player_id].push_back(stmp);//先存进来之后三个一起erase
+            stmp = checkChi(stmp);
+            //三个erase
+            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), previousCard(stmp)));
+            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
+            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), postCard(stmp)));
+            str_out << "CHI " << stmp << " ";
+            stmp = getBestCard();
+            str_out << stmp;
+        } else {
+            str_out << "PASS";
+        }
+    } else {
+        str_out << "PASS";
+    }
 }
 
 
