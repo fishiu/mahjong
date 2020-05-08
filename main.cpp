@@ -405,7 +405,7 @@ bool checkHu(vector<string> Cards, string lastCards = "n", string gotCard = "n")
  */
 string checkChi(string newCard) {
     vector<string> card;
-    card = my_card;
+    card = all_card[my_player_id];
     card.push_back(newCard);
     sort(card.begin(), card.end());
     vector<string>::iterator itr;
@@ -678,21 +678,21 @@ string initCondition() {
 					str_in.str(request[i - 1]);
 					str_in >> str_temp2 >> str_temp2 >> str_temp2;
 					//CHI操作打出的牌是第五个string
-					if (!strcmp(str_temp2, "CHI")) {
+					if (!strcmp(str_temp2.c_str(), "CHI")) {
 						str_in >> str_temp2 >> str_temp2;
 					}
 					//其他操作 打出的牌是第四个string
 					else str_in >> str_temp2;
-					if (!strcmp(str_temp2, previousCard(str_tmp)) {
+					if (!strcmp(str_temp2.c_str(), previousCard(str_tmp).c_str())) {
 						Chi_position = 1;
 					}
-					else if (!strcmp(str_temp2, postCard(str_tmp)) {
+					else if (!strcmp(str_temp2.c_str(), postCard(str_tmp).c_str())) {
 						Chi_position = 3;
 					}
-					else if (!strcmp(str_temp2, str_tmp)) {
+					else if (!strcmp(str_temp2.c_str(), str_tmp.c_str())) {
 						Chi_position = 2;
 					}
-					my_pack.push_back(makePack("CHI",str_temp,Chi_position));
+					my_pack.push_back(makePack("CHI",str_tmp,Chi_position));
                     //hand里面调整
                     all_card[player_id].erase(
                             find(all_card[my_player_id].begin(), all_card[my_player_id].end(), previousCard(str_tmp)));
@@ -890,7 +890,7 @@ void responseOutTurn() {
 			str_in.clear();
 			str_in.str(request[turn_id-1]);
 			str_in >> pre_Playerid >> pre_Playerid;
-			my_pack.push_back(makePack("PENG",stmp,pre_Playerid))
+			my_pack.push_back(makePack("PENG", stmp, pre_Playerid));
             //更新map
             setMyCard(my_player_id);
             stmp = getBestCard();
