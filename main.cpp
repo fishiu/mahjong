@@ -55,6 +55,8 @@ vector<string> peng;
 vector<string> chi;
 //存GANG完的牌
 vector<string> gang;
+//存牌堆里剩下的牌 <牌名，此牌数量>
+unordered_map<string, int> rest_card;
 
 /**
  * 快速生成牌名，注意是char
@@ -792,6 +794,40 @@ string initCondition() {
         }
     }
     return "Fail";
+}
+
+/**
+ * 计算一张牌被亮出来过几次
+ * @param card_name
+ * @return
+ */
+int getCardNumAll(string card_name) {
+    int _cnt = 0;
+    for (int i = 0; i < 5; ++i) {
+        for (int j = 0; j < all_card[i].size(); ++j) {
+            if (all_card[i][j] == card_name) {
+                _cnt++;
+            }
+        }
+    }
+    return _cnt;
+}
+
+/**
+ * 获取牌堆中剩下的牌
+ */
+void setRestCard() {
+    for (int i = 0; i <= 9; i++) {
+        rest_card[makeCardName('W', i)] = getCardNumAll(makeCardName('W', i));
+        rest_card[makeCardName('B', i)] = getCardNumAll(makeCardName('B', i));
+        rest_card[makeCardName('T', i)] = getCardNumAll(makeCardName('T', i));
+    }
+    for (int i = 0; i < 4; i++) {
+        rest_card[makeCardName('F', i)] = getCardNumAll(makeCardName('F', i));
+    }
+    for (int i = 0; i < 3; i++) {
+        rest_card[makeCardName('J', i)] = getCardNumAll(makeCardName('J', i));
+    }
 }
 
 /**
