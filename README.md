@@ -15,10 +15,10 @@ botzone 麻将程序对战作业
 
 ```c++
 // 所有牌命都用系统的命名
-// myCards 手牌
+// my_card 手牌
 // lastCard 刚才玩家出的牌（注意，不是我的上家出的牌！）
 // gotCard 我摸到的牌
-returnType funcName (vector<string> myCards, string lastCard, string getCard)
+returnType funcName (vector<string> my_card, string lastCard, string getCard)
 ```
 
 - 判断胡牌（不考虑番薯），返回bool

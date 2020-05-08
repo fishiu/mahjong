@@ -3,4 +3,4 @@ project(mahjong)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(mahjong main.cpp)
+add_executable(mahjong main.cpp mahjong.h)
