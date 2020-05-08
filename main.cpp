@@ -55,6 +55,9 @@ vector<string> peng;
 vector<string> chi;
 //存GANG完的牌
 vector<string> gang;
+//存我目前信息下牌墙中剩的牌
+unordered_map<string,int>rest_card;
+
 
 /**
  * 快速生成牌名，注意是char
@@ -115,15 +118,15 @@ pair<string, pair<string, int> > makePack(string type, string card_name, int det
  * W4”表示“四万”，“B6”表示“六筒”，“T8”表示“8条”  “F1”～“F4”表示“东南西北”，“J1”～“J3”表示“中发白”
  */
 void initMyCard() {
-    for (int i = 0; i <= 9; i++) {
+    for (int i = 1; i <= 9; i++) {
         my_active_card[makeCardName('W', i)] = 0;
         my_active_card[makeCardName('B', i)] = 0;
         my_active_card[makeCardName('T', i)] = 0;
     }
-    for (int i = 0; i < 4; i++) {
+    for (int i = 1; i <= 4; i++) {
         my_active_card[makeCardName('F', i)] = 0;
     }
-    for (int i = 0; i < 3; i++) {
+    for (int i = 1; i <= 3; i++) {
         my_active_card[makeCardName('J', i)] = 0;
     }
 }
@@ -151,42 +154,111 @@ void setMyCard(int my_player_ID) {
  * @return 牌名
  */
 string getSingleFengOrJian() {
-    for (int i = 0; i < 4; i++) {
+    for (int i = 1; i <= 4; i++) {
         if (my_active_card[makeCardName('F', i)] == 1) {
             return makeCardName('F', i);
         }
     }
-    for (int i = 0; i < 3; i++) {
+    for (int i = 1; i <= 4; i++) {
         if (my_active_card[makeCardName('J', i)] == 1) {
             return makeCardName('J', i);
         }
     }
     return "Fail";
 }
+/**
+ * 从两头向中间除去间隔2个空位的单牌 W,B,T
+ * @return 相应的牌名 如果找不到返回 Fail
+ */
+string eraseDouble() {
+	int i = 1, j = 9;
+	for (; i <= j; i++, j--) {
+		if (my_active_card[makeCardName('W', i)] == 1) {
+			if (!(i + 1 > 0 && i + 1 <= 9 && my_active_card[makeCardName('W', i + 1)] > 0) &&
+				!(i - 1 > 0 && i - 1 <= 9 && my_active_card[makeCardName('W', i - 1)] > 0) &&
+				!(i + 2 > 0 && i + 2 <= 9 && my_active_card[makeCardName('W', i + 2)] > 0) &&
+				!(i - 2 > 0 && i - 2 <= 9 && my_active_card[makeCardName('W', i - 2)] > 0))
+				return makeCardName('W', i);
+		}
+		if (j != i && my_active_card[makeCardName('W', j)] == 1) {
+			if (!(j + 1 > 0 && j + 1 <= 9 && my_active_card[makeCardName('W', j + 1)] > 0) &&
+				!(j - 1 > 0 && j - 1 <= 9 && my_active_card[makeCardName('W', j - 1)] > 0) &&
+				!(j + 2 > 0 && j + 2 <= 9 && my_active_card[makeCardName('W', j + 2)] > 0) &&
+				!(j - 2 > 0 && j - 2 <= 9 && my_active_card[makeCardName('W', j - 2)] > 0))
+				return makeCardName('W', j);
+		}
+	}
+	return "Fail";
+}
+
+
 
 /**
  * 从两头向中间除去间隔1个空位的单牌 W,B,T
  * @return 相应的牌名 如果找不到返回 Fail
  */
 string eraseSingle() {
-    int i = 1, j = 9;
-    for (; i <= j; i++, j--) {
-        if (my_active_card[makeCardName('W', i)] == 1) {
-            if (!(i + 1 > 0 && i + 1 <= 9 && my_active_card[makeCardName('W', i + 1)] > 0) &&
-                !(i - 1 > 0 && i - 1 <= 9 && my_active_card[makeCardName(
-                        'W', i - 1)] > 0))
-                return makeCardName('W', i);
-        }
-        if (j != i && my_active_card[makeCardName('W', j)] == 1) {
-            if (!(j + 1 > 0 && j + 1 <= 9 && my_active_card[makeCardName('W', j + 1)] > 0) &&
-                !(j - 1 > 0 && j - 1 <= 9 && my_active_card[makeCardName(
-                        'W', j - 1)] > 0))
-                return makeCardName('W', j);
-        }
-    }
-    return "Fail";
+	int i = 1, j = 9;
+	for (; i <= j; i++, j--) {
+		if (my_active_card[makeCardName('W', i)] == 1) {
+			if (!(i + 1 > 0 && i + 1 <= 9 && my_active_card[makeCardName('W', i + 1)] > 0) &&
+				!(i - 1 > 0 && i - 1 <= 9 && my_active_card[makeCardName(
+					'W', i - 1)] > 0))
+				return makeCardName('W', i);
+		}
+		if (j != i && my_active_card[makeCardName('W', j)] == 1) {
+			if (!(j + 1 > 0 && j + 1 <= 9 && my_active_card[makeCardName('W', j + 1)] > 0) &&
+				!(j - 1 > 0 && j - 1 <= 9 && my_active_card[makeCardName(
+					'W', j - 1)] > 0))
+				return makeCardName('W', j);
+		}
+	}
+	return "Fail";
 }
-
+/**
+*判断听牌，如果可以听牌，返回扔掉的牌
+*找不到返回Fail
+*/
+string checkTing() {
+	auto it = my_active_card.begin();
+	unordered_map<string, int> hu_possibility;
+	//遍历所有的key
+	for (; it != my_active_card.end(); it++) {
+		//如果有超过一张
+		if (it->second > 0) {
+			int value = it->second;
+			all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), value));
+			//可能胡牌的个数
+			int sum = 0;
+			//遍历牌墙剩下的牌
+			for (auto i = rest_card.begin(); i != rest_card.end(); i++) {
+				if (i->second > 0 && checkHu(all_card[my_player_id],i->first)) {
+					sum += i->second;
+				}
+			}
+			if (sum) {
+				hu_possibility[it->first] = sum;
+			}
+			//需要插回去
+			all_card[my_player_id].push_back(value);
+		}
+	}
+	//找出sum最大的值
+	if (hu_possibility.size() == 0) {
+		return "Fail";
+	}
+	else {
+		string throw_card;
+		int max_card = 0;
+		for (auto it = hu_possibility.begin(); it != hu_possibility.end(); it++) {
+			if (it->second > max_card) {
+				max_card = it->second;
+				throw_card = it->first;
+			}
+		}
+		return throw_card;
+	}
+}
 /**
  * 从两头向中间除去单牌 W,B,T
  * @return 相应的牌名 如果找不到返回 Fail
