@@ -1153,6 +1153,67 @@ string checkChi(string newCard) {
 	if (newCard[0] == 'F' || newCard[0] == 'J')
 		return "Fail";
 
+	int flag_1=0, flag_2=0, flag0=0, flag1=0, flag2 = 0;
+	if (my_active_card[previousCard(previousCard(newcard))]) {
+		flag_2 = my_active_card[previousCard(previousCard(newcard))];
+	}
+	if (my_active_card[previousCard(newCard)]) {
+		flag_1 = my_active_card[previousCard(newCard)];
+	}
+	flag0 = 1;
+	if (my_active_card[postCard(postCard(newCard))]) {
+		flag2 = my_active_card[postCard(postCard(newCard))];
+	}
+	if (my_active_card[postCard(newCard)]) {
+		flag1 = my_active_card[postCard(newCard)];
+	}
+	if (newCard[1] - '0' > 5) {
+		if (flag1 == 1 && flag2 == 1) {
+			return postCard(newCard);
+		}
+		if (flag_1 == 1 && flag1 == 1) {
+			return newCard;
+		}
+		if (flag_1 == 1 && flag_2 == 1) {
+			return previousCard(newCard);
+		}
+	}
+	else {
+		if (flag_1 == 1 && flag_2 == 1) {
+			return previousCard(newCard);
+		}
+		if (flag_1 == 1 && flag1 == 1) {
+			return newCard;
+		}
+		if (flag1 == 1 && flag2 == 1) {
+			return postCard(newCard);
+		}
+	}
+	if (newCard[1] - '0' > 5) {
+		if (flag1 == 2 && flag2 == 2) {
+			return postCard(newCard);
+		}
+		if (flag_1 == 2 && flag1 == 2) {
+			return newCard;
+		}
+		if (flag_1 == 2 && flag_2 == 2) {
+			return previousCard(newCard);
+		}
+	}
+	else {
+		if (flag_1 == 2 && flag_2 == 2) {
+			return previousCard(newCard);
+		}
+		if (flag_1 == 2 && flag1 == 2) {
+			return newCard;
+		}
+		if (flag1 == 2 && flag2 == 2) {
+			return postCard(newCard);
+		}
+	}
+
+	return "Fail";
+	/*
 	vector<string> card;
 
 	card = all_card[my_player_id];
@@ -1162,6 +1223,7 @@ string checkChi(string newCard) {
 	sort(card.begin(), card.end());
 
 	vector<string>::iterator itr;
+	vector<string>::iterator tmptr;
 
 	itr = find(card.begin(), card.end(), newCard);
 
@@ -1173,17 +1235,27 @@ string checkChi(string newCard) {
 
 	string str2 = "N";
 
-	if (itr != card.begin()) str_1 = *(itr - 1);
+	string str0 = *(itr);
 
+	tmptr = itr;
+	while (itr != card.begin() && !strcmp(tmptr->c_str(), itr->c_str()) {
+		tmptr = itr - 1;
+	}	
+	str_1 = *tmptr;
 
+	tmptr = itr;
+	while (itr != card.begin() && itr - 1 != card.begin() && !strcmp(tmptr->c_str(), itr->c_str()) {
+		tmptr = itr - 1;
+	}
+	str_1 = *tmptr;
 
 	if (itr - 1 != card.begin()) { str_2 = *(itr - 2); }
 
 	//itr++; itr++;
 
-	string str0 = *(itr);
+	
 
-	if (itr + 1 < card.end()) str1 = *(itr + 1);
+	if (itr + 1 != card.end()) str1 = *(itr + 1);
 
 	//itr++; itr++;
 
@@ -1213,15 +1285,15 @@ string checkChi(string newCard) {
 
 	if (str_1[0] == newCard[0] && str1[0] == newCard[0]) {
 
-		if (str_1.length() > 1 && str_2.length() > 1 && newCard[1] - str_1[1] == 1 && str1[1] - newCard[1] == 1) {
+		if (str_1.length() > 1 && str1.length() > 1 && newCard[1] - str_1[1] == 1 && str1[1] - newCard[1] == 1) {
 
 			return newCard;
 
 		}
 
 	}
+	*/
 
-	return "Fail";
 
 }
 
