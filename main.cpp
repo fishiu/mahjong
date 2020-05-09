@@ -1148,6 +1148,8 @@ string single() {
  */
 
 string checkChi(string newCard) {
+	return "Fail";
+
 	if (newCard[0] == 'F' || newCard[0] == 'J')
 		return "Fail";
 
