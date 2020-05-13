@@ -73,6 +73,27 @@ int getCardNumAll(string card_name) {
 			}
 		}
 	}
+	for (int i = 0; i < peng.size(); i++) {
+		if (peng[i] == card_name) {
+			cnt += 3;
+		}
+	}
+	for (int i = 0; i < gang.size(); i++) {
+		if (gang[i] == card_name) {
+			cnt += 4;
+		}
+	}
+	for (int i = 0; i < chi.size(); i++) {
+		if (chi[i] == card_name) {
+			cnt ++;
+		}
+		if (postCard(chi[i]) == card_name) {
+			cnt++;
+		}
+		if (previousCard(chi[i]) == card_name) {
+			cnt++;
+		}
+	}
 	return _cnt;
 }
 
@@ -94,15 +115,15 @@ string makeCardName(char type, int number) {
 /*获取牌堆中剩下的牌*/
 void getRestCard() {
 	for (int i = 1; i <= 9; i++) {
-		rest_card[makeCardName('W', i)] = getCardNumAll(makeCardName('W', i));
-		rest_card[makeCardName('B', i)] = getCardNumAll(makeCardName('B', i));
-		rest_card[makeCardName('T', i)] = getCardNumAll(makeCardName('T', i));
+		rest_card[makeCardName('W', i)] = 4-getCardNumAll(makeCardName('W', i));
+		rest_card[makeCardName('B', i)] = 4-getCardNumAll(makeCardName('B', i));
+		rest_card[makeCardName('T', i)] = 4-getCardNumAll(makeCardName('T', i));
 	}
 	for (int i = 1; i <= 4; i++) {
-		rest_card[makeCardName('F', i)] = getCardNumAll(makeCardName('F', i));
+		rest_card[makeCardName('F', i)] = 4-getCardNumAll(makeCardName('F', i));
 	}
 	for (int i = 1; i <= 3; i++) {
-		rest_card[makeCardName('J', i)] = getCardNumAll(makeCardName('J', i));
+		rest_card[makeCardName('J', i)] = 4-getCardNumAll(makeCardName('J', i));
 	}
 }
 
@@ -1097,7 +1118,7 @@ map<string, int> easy_make_map(vector<string>::iterator start, vector<string>::i
 
 //是不是相邻的牌。如B4,B5返回true，B3,B5分会false
 bool adjacent_card(string card1, string card2) {
-	if (card1[0] == card2[0] && card2[1] - card2[0] == 1)
+	if (card1[0] == card2[0] && （card2[1] - card1[1] == 1 || card2[1] - card1[1] == -1）)
 		return true;
 	return false;
 }
@@ -1108,15 +1129,15 @@ bool adjacent_card(string card1, string card2) {
  */
 void setRestCard() {
 	for (int i = 0; i <= 9; i++) {
-		rest_card[makeCardName('W', i)] = getCardNumAll(makeCardName('W', i));
-		rest_card[makeCardName('B', i)] = getCardNumAll(makeCardName('B', i));
-		rest_card[makeCardName('T', i)] = getCardNumAll(makeCardName('T', i));
+		rest_card[makeCardName('W', i)] = 4-getCardNumAll(makeCardName('W', i));
+		rest_card[makeCardName('B', i)] = 4-getCardNumAll(makeCardName('B', i));
+		rest_card[makeCardName('T', i)] = 4-getCardNumAll(makeCardName('T', i));
 	}
 	for (int i = 0; i < 4; i++) {
-		rest_card[makeCardName('F', i)] = getCardNumAll(makeCardName('F', i));
+		rest_card[makeCardName('F', i)] = 4-getCardNumAll(makeCardName('F', i));
 	}
 	for (int i = 0; i < 3; i++) {
-		rest_card[makeCardName('J', i)] = getCardNumAll(makeCardName('J', i));
+		rest_card[makeCardName('J', i)] = 4-getCardNumAll(makeCardName('J', i));
 	}
 }
 
@@ -1397,7 +1418,12 @@ int main() {
 
 	//Json交互的输入（删掉了普通交互）
 	Json::Value input_json;
-	cin >> input_json;
+//	cin >> input_json;
+    //==========debug============
+    Json::Reader reader;
+    string myin = string("{\"requests\":[\"0 0 0\",\"1 0 0 0 0 F3 W3 T7 T5 W8 W2 F4 W2 B1 B9 T4 T3 W2\",\"2 T7\",\"3 0 PLAY F3\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"3 2 DRAW\",\"3 2 PLAY J1\",\"3 3 DRAW\",\"3 3 PLAY J1\",\"2 W4\",\"3 0 PLAY F4\",\"3 1 DRAW\",\"3 1 PLAY F4\",\"3 2 DRAW\",\"3 2 PLAY J1\",\"3 3 DRAW\",\"3 3 PLAY F3\",\"2 T4\",\"3 0 PLAY B1\",\"3 1 DRAW\",\"3 1 PLAY B9\",\"3 2 DRAW\",\"3 2 PLAY F2\",\"3 1 PENG T9\",\"3 2 DRAW\",\"3 2 PLAY T8\",\"3 3 DRAW\",\"3 3 PLAY J3\",\"2 T7\",\"3 0 PLAY B9\",\"3 1 DRAW\",\"3 1 PLAY T2\",\"3 2 DRAW\",\"3 2 PLAY T4\",\"3 0 PENG W8\",\"3 1 DRAW\",\"3 1 PLAY B3\",\"3 2 CHI B2 T1\",\"3 3 DRAW\",\"3 3 PLAY T8\",\"2 W9\",\"3 0 PLAY W9\",\"3 1 DRAW\",\"3 1 PLAY B8\",\"3 2 DRAW\",\"3 2 PLAY B6\",\"3 3 CHI B5 B5\",\"2 B5\",\"3 0 PLAY B5\",\"3 1 DRAW\",\"3 1 PLAY B1\",\"3 2 DRAW\",\"3 2 PLAY B5\",\"3 3 DRAW\",\"3 3 PLAY W7\",\"2 T9\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY T6\",\"3 2 DRAW\",\"3 2 PLAY B2\",\"3 3 DRAW\",\"3 3 PLAY B2\",\"2 F3\",\"3 0 PLAY F3\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"3 2 DRAW\",\"3 2 PLAY F1\",\"3 3 DRAW\",\"3 3 PLAY B8\",\"2 F4\",\"3 0 PLAY F4\",\"3 1 DRAW\",\"3 1 PLAY B8\",\"3 2 DRAW\",\"3 2 PLAY J3\",\"3 3 DRAW\",\"3 3 PLAY B3\",\"2 W2\",\"3 0 GANG\",\"2 T6\",\"3 0 PLAY W3\",\"3 1 DRAW\",\"3 1 PLAY F3\",\"3 2 DRAW\",\"3 2 PLAY T4\",\"3 3 DRAW\",\"3 3 PLAY B1\",\"2 T8\",\"3 0 PLAY T5\",\"3 1 DRAW\",\"3 1 PLAY T5\",\"3 2 DRAW\",\"3 2 PLAY T9\",\"3 3 DRAW\",\"3 3 PLAY T2\",\"2 J2\",\"3 0 PLAY J2\",\"3 2 PENG W1\",\"3 3 DRAW\",\"3 3 PLAY F1\",\"2 F4\",\"3 0 PLAY F4\",\"3 1 DRAW\",\"3 1 PLAY B3\",\"3 2 DRAW\",\"3 2 PLAY W4\",\"3 3 CHI W4 B6\",\"2 W4\",\"3 0 PLAY W4\",\"3 1 CHI W4 W1\",\"3 2 DRAW\",\"3 2 PLAY W1\",\"3 3 DRAW\",\"3 3 PLAY B6\",\"2 T5\",\"3 0 PLAY T5\",\"3 1 DRAW\",\"3 1 PLAY B7\",\"3 2 DRAW\",\"3 2 PLAY B2\",\"3 3 DRAW\",\"3 3 PLAY T8\",\"3 0 CHI T7 T7\",\"3 1 DRAW\",\"3 1 PLAY W5\",\"3 2 CHI W6 W7\",\"3 3 DRAW\",\"3 3 PLAY T6\",\"2 F1\",\"3 0 PLAY F1\",\"3 1 DRAW\",\"3 1 PLAY T9\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"3 3 DRAW\",\"3 3 PLAY T5\",\"2 T6\",\"3 0 PLAY T6\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY W9\",\"3 3 DRAW\",\"3 3 PLAY B7\",\"2 W1\",\"3 0 PLAY W1\",\"3 1 DRAW\",\"3 1 PLAY T3\",\"3 2 DRAW\",\"3 2 PLAY B6\",\"3 3 DRAW\",\"3 3 PLAY F1\",\"2 T7\",\"3 0 PLAY T7\",\"3 1 DRAW\",\"3 1 PLAY W8\",\"3 2 PENG B4\",\"3 3 DRAW") + string("\",\"3 3 PLAY J2\",\"2 B7\",\"3 0 PLAY B7\",\"3 1 CHI B8 B7\",\"3 2 DRAW\",\"3 2 PLAY B4\",\"3 3 DRAW\",\"3 3 PLAY B3\"],\"responses\":[\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PENG W8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"GANG W2\",\"PASS\",\"PLAY W3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY J2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"CHI T7 T7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T6\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
+    reader.parse(myin, input_json);
+    //==========debug============
 	//当前回合的下标（即总共回合数量-1）
 	turn_id = input_json["responses"].size();
 	//读取交互信息，存入request和response
