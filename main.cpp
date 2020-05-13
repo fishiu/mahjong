@@ -73,6 +73,27 @@ int getCardNumAll(string card_name) {
 			}
 		}
 	}
+	for (int i = 0; i < peng.size(); i++) {
+		if (peng[i] == card_name) {
+			cnt += 3;
+		}
+	}
+	for (int i = 0; i < gang.size(); i++) {
+		if (gang[i] == card_name) {
+			cnt += 4;
+		}
+	}
+	for (int i = 0; i < chi.size(); i++) {
+		if (chi[i] == card_name) {
+			cnt ++;
+		}
+		if (postCard(chi[i]) == card_name) {
+			cnt++;
+		}
+		if (previousCard(chi[i]) == card_name) {
+			cnt++;
+		}
+	}
 	return _cnt;
 }
 
@@ -94,15 +115,15 @@ string makeCardName(char type, int number) {
 /*获取牌堆中剩下的牌*/
 void getRestCard() {
 	for (int i = 1; i <= 9; i++) {
-		rest_card[makeCardName('W', i)] = getCardNumAll(makeCardName('W', i));
-		rest_card[makeCardName('B', i)] = getCardNumAll(makeCardName('B', i));
-		rest_card[makeCardName('T', i)] = getCardNumAll(makeCardName('T', i));
+		rest_card[makeCardName('W', i)] = 4-getCardNumAll(makeCardName('W', i));
+		rest_card[makeCardName('B', i)] = 4-getCardNumAll(makeCardName('B', i));
+		rest_card[makeCardName('T', i)] = 4-getCardNumAll(makeCardName('T', i));
 	}
 	for (int i = 1; i <= 4; i++) {
-		rest_card[makeCardName('F', i)] = getCardNumAll(makeCardName('F', i));
+		rest_card[makeCardName('F', i)] = 4-getCardNumAll(makeCardName('F', i));
 	}
 	for (int i = 1; i <= 3; i++) {
-		rest_card[makeCardName('J', i)] = getCardNumAll(makeCardName('J', i));
+		rest_card[makeCardName('J', i)] = 4-getCardNumAll(makeCardName('J', i));
 	}
 }
 
@@ -1094,7 +1115,7 @@ map<string, int> easy_make_map(vector<string>::iterator start, vector<string>::i
 
 //是不是相邻的牌。如B4,B5返回true，B3,B5分会false
 bool adjacent_card(string card1, string card2) {
-	if (card1[0] == card2[0] && card2[1] - card2[0] == 1)
+	if (card1[0] == card2[0] && （card2[1] - card1[1] == 1 || card2[1] - card1[1] == -1）)
 		return true;
 	return false;
 }
@@ -1105,15 +1126,15 @@ bool adjacent_card(string card1, string card2) {
  */
 void setRestCard() {
 	for (int i = 0; i <= 9; i++) {
-		rest_card[makeCardName('W', i)] = getCardNumAll(makeCardName('W', i));
-		rest_card[makeCardName('B', i)] = getCardNumAll(makeCardName('B', i));
-		rest_card[makeCardName('T', i)] = getCardNumAll(makeCardName('T', i));
+		rest_card[makeCardName('W', i)] = 4-getCardNumAll(makeCardName('W', i));
+		rest_card[makeCardName('B', i)] = 4-getCardNumAll(makeCardName('B', i));
+		rest_card[makeCardName('T', i)] = 4-getCardNumAll(makeCardName('T', i));
 	}
 	for (int i = 0; i < 4; i++) {
-		rest_card[makeCardName('F', i)] = getCardNumAll(makeCardName('F', i));
+		rest_card[makeCardName('F', i)] = 4-getCardNumAll(makeCardName('F', i));
 	}
 	for (int i = 0; i < 3; i++) {
-		rest_card[makeCardName('J', i)] = getCardNumAll(makeCardName('J', i));
+		rest_card[makeCardName('J', i)] = 4-getCardNumAll(makeCardName('J', i));
 	}
 }
 
