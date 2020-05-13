@@ -346,20 +346,22 @@ string eraseSingle() {
 }
 
 /**
- * 其中后两个参数有默认值，选其一 不得两个都有
+ * 判断胡牌
  * @param Cards 手中的13张牌
- * @param lastCards 上轮打出来的牌
  * @param gotCard 自己摸到的牌
  * @return 胡 true 不胡 false
  */
-bool checkHu(vector<string> Cards, string lastCards = "n", string gotCard = "n") {
+bool checkHu(vector<string> Cards,string gotCard) {
+    setMyCard(my_player_id);
+    //首先将新来的牌加入到my_active_card (后面会再删掉)
+    my_active_card[gotCard]=my_active_card[gotCard]+1;
     vector<string> myCards;
     //复制出一个vector方便操作
     myCards = Cards;
     //如果是要了牌桌上的牌
-    if (lastCards.size() == 2) {
-        myCards.push_back(lastCards);
-    }
+    //if (lastCards.size() == 2) {
+    //	myCards.push_back(lastCards);
+    //}
     //如果是自己摸的牌
     if (gotCard.size() == 2) {
         myCards.push_back(gotCard);
@@ -406,6 +408,7 @@ bool checkHu(vector<string> Cards, string lastCards = "n", string gotCard = "n")
     zong.push_back(T);
     zong.push_back(W);
     vector<vector<string> >::iterator zongit;
+    /*
     for (zongit = zong.begin(); zongit < zong.end(); zongit++) {
         vector<string> vec = *zongit;
         sort(vec.begin(), vec.end());
@@ -465,9 +468,73 @@ bool checkHu(vector<string> Cards, string lastCards = "n", string gotCard = "n")
             }
         }
     }
+    */
+
+    for (int i = 1; i <= 9; i++) {
+        if (my_active_card[makeCardName('W', i)] >= 3) {
+            kezi++;
+        }
+        if (my_active_card[makeCardName('B', i)] >= 3) {
+            kezi++;
+        }
+        if (my_active_card[makeCardName('T', i)] >= 3) {
+            kezi++;
+        }
+        if (my_active_card[makeCardName('W', i)] == 2) {
+            duizi++;
+        }
+        if (my_active_card[makeCardName('B', i)] == 2) {
+            duizi++;
+        }
+        if (my_active_card[makeCardName('T', i)] == 2) {
+            duizi++;
+        }
+    }
+    for (int i = 1; i <= 7; i++) {
+        if (my_active_card[makeCardName('W', i)] && my_active_card[makeCardName('W', i + 1)] && my_active_card[makeCardName('W', i + 2)]) {
+            shunzi++;
+            i += 2;
+        }
+    }
+    for (int i = 1; i <= 7; i++) {
+        if (my_active_card[makeCardName('B', i)] && my_active_card[makeCardName('B', i + 1)] && my_active_card[makeCardName('B', i + 2)]) {
+            shunzi++;
+            i += 2;
+        }
+    }
+    for (int i = 1; i <= 7; i++) {
+        if (my_active_card[makeCardName('T', i)] && my_active_card[makeCardName('T', i + 1)] && my_active_card[makeCardName('T', i + 2)]) {
+            shunzi++;
+            i += 2;
+        }
+    }
+    for (int i = 1; i <= 4; i++) {
+        if (my_active_card[makeCardName('F', i)] >= 3) {
+            kezi++;
+        }
+        if (my_active_card[makeCardName('F', i)] == 2) {
+            duizi++;
+        }
+    }
+    for (int i = 1; i <= 3; i++) {
+        if (my_active_card[makeCardName('J', i)] >= 3) {
+            kezi++;
+        }
+        if (my_active_card[makeCardName('J', i)] == 2) {
+            duizi++;
+        }
+    }
     //在这里加一个顺子刻子对子
     shunzi += chi.size();
     kezi += gang.size() + peng.size();
+    /*测试用
+    cout<<"shunzi:"<<shunzi<<endl;
+    cout<<"kezi:"<<kezi<<endl;
+    cout<<"duizi:"<<duizi<<endl;
+    */
+    //删掉
+    my_active_card[gotCard]=my_active_card[gotCard]-1;
+
     //七连对
     if (duizi == 7) {
         return true;
@@ -546,7 +613,6 @@ bool checkHu(vector<string> Cards, string lastCards = "n", string gotCard = "n")
     }
     return false;
 }
-
 
 
 /**
@@ -1510,7 +1576,7 @@ int main() {
 //    cin >> input_json;
     //==========debug============
     Json::Reader reader;
-    string myin = string("{\"requests\":[\"0 3 2\",\"1 0 0 0 0 B5 F2 T7 T4 T1 F3 T9 J1 J2 W7 T6 B5 J1\",\"3 0 DRAW\",\"3 0 PLAY J3\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"3 2 DRAW\",\"3 2 PLAY J2\",\"2 T7\",\"3 3 PLAY F2\",\"3 0 DRAW\",\"3 0 PLAY F1\",\"3 1 DRAW\",\"3 1 PLAY F4\",\"3 2 DRAW\",\"3 2 PLAY B4\",\"2 T5\",\"3 3 PLAY F3\",\"3 0 DRAW\",\"3 0 PLAY F4\",\"3 1 DRAW\",\"3 1 PLAY F3\",\"3 2 DRAW\",\"3 2 PLAY T5\",\"3 3 CHI T5 J2\",\"3 0 DRAW\",\"3 0 PLAY W9\",\"3 1 DRAW\",\"3 1 PLAY T9\",\"3 2 DRAW\",\"3 2 PLAY F4\",\"2 F2\",\"3 3 PLAY F2\",\"3 0 DRAW\",\"3 0 PLAY F2\",\"3 1 DRAW\",\"3 1 PLAY T8\",\"3 2 DRAW\",\"3 2 PLAY T3\",\"2 F1\",\"3 3 PLAY F1\",\"3 0 DRAW\",\"3 0 PLAY B1\",\"3 1 DRAW\",\"3 1 PLAY T1\",\"3 2 DRAW\",\"3 2 PLAY B3\",\"2 W3\",\"3 3 PLAY T1\",\"3 0 DRAW\",\"3 0 PLAY B8\",\"3 1 DRAW\",\"3 1 PLAY T1\",\"3 2 DRAW\",\"3 2 PLAY T2\",\"2 W3\",\"3 3 PLAY W7\",\"3 0 CHI W6 W6\",\"3 1 DRAW\",\"3 1 PLAY B9\",\"3 2 DRAW\",\"3 2 PLAY T7\",\"3 3 PENG T9\",\"3 0 DRAW\",\"3 0 PLAY W5\",\"3 1 DRAW\",\"3 1 PLAY T8\",\"3 2 DRAW\",\"3 2 PLAY T5\",\"2 J3\",\"3 3 PLAY J3\",\"3 0 DRAW\",\"3 0 PLAY W5\",\"3 1 DRAW\",\"3 1 PLAY B9\",\"3 2 DRAW\",\"3 2 PLAY B2\",\"2 W6\",\"3 3 PLAY W6\",\"3 0 DRAW\",\"3 0 PLAY B7\",\"3 1 DRAW\",\"3 1 PLAY B6\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"2 T6\",\"3 3 PLAY T5\",\"3 0 DRAW\",\"3 0 PLAY B8\",\"3 1 DRAW\",\"3 1 PLAY B6\",\"3 2 DRAW\",\"3 2 PLAY B1\",\"2 W2\",\"3 3 PLAY T6\",\"3 0 CHI T6 T9\",\"3 1 DRAW\",\"3 1 PLAY B4\",\"3 2 DRAW\",\"3 2 PLAY T3\",\"2 W5\",\"3 3 PLAY W5\",\"3 0 DRAW\",\"3 0 PLAY T1\",\"3 1 DRAW\",\"3 1 PLAY W9\",\"3 2 DRAW\",\"3 2 PLAY F2\",\"2 B6\",\"3 3 PLAY W3\",\"3 0 DRAW\",\"3 0 PLAY B7\",\"3 1 DRAW\",\"3 1 PLAY J2\",\"3 2 DRAW\",\"3 2 PLAY T6\",\"2 W2\",\"3 3 PLAY W3\",\"3 0 DRAW\",\"3 0 PLAY B8\",\"3 1 DRAW\",\"3 1 PLAY B2\",\"3 2 DRAW\",\"3 2 PLAY B9\",\"2 F3\",\"3 3 PLAY F3\",\"3 0 DRAW\",\"3 0 PLAY W9\",\"3 1 DRAW\",\"3 1 PLAY T2\",\"3 2 DRAW\",\"3 2 PLAY W7\",\"2 F4\",\"3 3 PLAY F4\",\"3 0 DRAW\",\"3 0 PLAY W9\",\"3 1 DRAW\",\"3 1 PLAY W8\",\"3 2 DRAW\",\"3 2 PLAY J1\",\"3 3 PENG B5\",\"3 0 DRAW\",\"3 0 PLAY T4\",\"3 1 DRAW\",\"3 1 PLAY F1\",\"3 2 DRAW\",\"3 2 PLAY B7\"],\"responses\":[\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"P") + string("ASS\",\"PASS\",\"PASS\",\"CHI T5 J2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PENG T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY J3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W6\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T6\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PENG B5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
+    string myin = string("{\"requests\":[\"0 0 1\",\"1 0 0 0 0 J2 W4 W8 T9 W9 B1 W6 J1 B8 W8 J1 T2 F4\",\"2 W1\",\"3 0 PLAY F4\",\"3 1 DRAW\",\"3 1 PLAY F4\",\"3 2 DRAW\",\"3 2 PLAY J2\",\"3 3 DRAW\",\"3 3 PLAY F2\",\"2 T6\",\"3 0 PLAY J2\",\"3 1 DRAW\",\"3 1 PLAY J1\",\"3 0 PENG W1\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"3 3 PENG W2\",\"2 T5\",\"3 0 PLAY B1\",\"3 1 DRAW\",\"3 1 PLAY B9\",\"3 2 DRAW\",\"3 2 PLAY W4\",\"3 3 DRAW\",\"3 3 PLAY F3\",\"2 F3\",\"3 0 PLAY F3\",\"3 1 DRAW\",\"3 1 PLAY B9\",\"3 2 DRAW\",\"3 2 PLAY J2\",\"3 3 DRAW\",\"3 3 PLAY W6\",\"2 T6\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY B2\",\"3 2 DRAW\",\"3 2 PLAY W9\",\"3 3 DRAW\",\"3 3 PLAY W5\",\"3 0 CHI W5 T2\",\"3 1 DRAW\",\"3 1 PLAY B2\",\"3 2 DRAW\",\"3 2 PLAY F1\",\"3 3 DRAW\",\"3 3 PLAY B1\",\"2 F1\",\"3 0 PLAY F1\",\"3 1 DRAW\",\"3 1 PLAY W2\",\"3 2 DRAW\",\"3 2 PLAY B2\",\"3 3 DRAW\",\"3 3 PLAY B8\",\"2 W9\",\"3 0 PLAY B8\",\"3 1 DRAW\",\"3 1 PLAY F3\",\"3 2 DRAW\",\"3 2 PLAY F2\",\"3 3 DRAW\",\"3 3 PLAY W5\",\"2 B3\",\"3 0 PLAY B3\",\"3 1 DRAW\",\"3 1 PLAY F1\",\"3 2 DRAW\",\"3 2 PLAY F2\",\"3 3 DRAW\",\"3 3 PLAY T1\",\"2 T4\",\"3 0 PLAY W9\",\"3 1 DRAW\",\"3 1 PLAY B1\",\"3 2 DRAW\",\"3 2 PLAY B3\",\"3 3 DRAW\",\"3 3 PLAY W4\",\"2 B3\",\"3 0 PLAY W9\",\"3 1 DRAW\",\"3 1 PLAY T1\",\"3 2 DRAW\",\"3 2 PLAY T3\",\"3 3 CHI T4 T8\",\"2 T3\",\"3 0 PLAY T6\",\"3 1 DRAW\",\"3 1 PLAY W1\",\"3 2 DRAW\",\"3 2 PLAY T8\",\"3 3 DRAW\",\"3 3 PLAY B8\",\"2 W3\",\"3 0 PLAY W3\",\"3 1 DRAW\",\"3 1 PLAY J1\",\"3 2 DRAW\",\"3 2 PLAY B1\",\"3 3 DRAW\",\"3 3 PLAY T9\",\"2 T4\",\"3 0 PLAY T4\",\"3 1 DRAW\",\"3 1 PLAY T9\",\"3 2 DRAW\",\"3 2 PLAY B4\",\"3 3 DRAW\",\"3 3 PLAY B8\",\"2 T9\",\"3 0 PLAY B3\",\"3 1 DRAW\",\"3 1 PLAY B7\",\"3 2 DRAW\",\"3 2 PLAY B7\",\"3 3 DRAW\",\"3 3 PLAY F3\",\"2 F2\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY B9\",\"3 2 DRAW\",\"3 2 PLAY W7\",\"3 3 DRAW\",\"3 3 PLAY B9\",\"2 W2\",\"3 0 PLAY W2\",\"3 1 DRAW\",\"3 1 PLAY T2\"],\"responses\":[\"PASS\",\"PASS\",\"PLAY F4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY J2\",\"PASS\",\"PASS\",\"PENG W1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"CHI W5 T2\",\"PASS\",\"PASS\",\"PASS\",\"PASS") + string("\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T6\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W2\",\"PASS\",\"PASS\"]}");
     reader.parse(myin, input_json);
     //==========debug============
     //当前回合的下标（即总共回合数量-1）
