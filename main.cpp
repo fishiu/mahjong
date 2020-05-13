@@ -58,12 +58,11 @@ vector<string> chi;
 vector<string> gang;
 //存我目前信息下牌墙中剩的牌
 unordered_map<string, int>rest_card;
-//存我目前信息下牌墙中剩的牌
-unordered_map<string, int>all_rest_card;
 //存我的手牌的排序形式
 vector<string> sorted_my_card;
 
-
+//下面是为了复式赛制增加的解决牌荒问题的变量
+int left_card_num[4] = {21, 21, 21, 21}; //34张初始发掉13张剩下21张
 
 /**
  * 快速生成牌名，注意是char
@@ -147,7 +146,7 @@ int getCardNumAll(string card_name) {
 	}
 	return _cnt;
 }
-/*获取牌堆中剩下的牌 + 别人手中的牌*/
+/*获取牌堆中剩下的牌*/
 void getRestCard() {
 	for (int i = 1; i <= 9; i++) {
 		rest_card[makeCardName('W', i)] = 4 - getCardNumAll(makeCardName('W', i));
@@ -159,21 +158,6 @@ void getRestCard() {
 	}
 	for (int i = 1; i <= 3; i++) {
 		rest_card[makeCardName('J', i)] = 4 - getCardNumAll(makeCardName('J', i));
-	}
-}
-
-//和getrestcard相反，是已经有的牌的数量
-void getAllCard() {
-	for (int i = 1; i <= 9; i++) {
-		all_rest_card[makeCardName('W', i)] = getCardNumAll(makeCardName('W', i));
-		all_rest_card[makeCardName('B', i)] = getCardNumAll(makeCardName('B', i));
-		all_rest_card[makeCardName('T', i)] = getCardNumAll(makeCardName('T', i));
-	}
-	for (int i = 1; i <= 4; i++) {
-		all_rest_card[makeCardName('F', i)] = getCardNumAll(makeCardName('F', i));
-	}
-	for (int i = 1; i <= 3; i++) {
-		all_rest_card[makeCardName('J', i)] = getCardNumAll(makeCardName('J', i));
 	}
 }
 
@@ -847,66 +831,6 @@ int getFan() {
 
 	return sum;
 }
-/*不点炮*/
-//目标是输入一副胡牌牌型，输出
-string bu_dian_pao() {
-	//有一个all_rest_card的map
-	getAllCard();
-	setMyCard(my_player_id);
-	//先把我没有的牌删了,即all_rest_card记为-1，接下来就输出all_rest_card比较多的牌
-	for (int i = 1; i <= 9; i++) {
-		if (my_active_card[makeCardName('W', i)] == 0) {
-			all_rest_card[makeCardName('W', i)] = -1;
-		}
-		if (my_active_card[makeCardName('B', i)] == 0) {
-			all_rest_card[makeCardName('B', i)] = -1;
-		}
-		if (my_active_card[makeCardName('T', i)] == 0) {
-			all_rest_card[makeCardName('T', i)] = -1;
-		}
-	}
-	for (int i = 1; i <= 4; i++) {
-		if (my_active_card[makeCardName('F', i)] == 0) {
-			all_rest_card[makeCardName('F', i)] = -1;
-		}
-	}
-	for (int i = 1; i <= 3; i++) {
-		if (my_active_card[makeCardName('J', i)] == 0) {
-			all_rest_card[makeCardName('J', i)] = -1;
-		}
-	}
-	string most_card = "error";
-	int max_card_num = -1;
-	
-	for (int i = 1; i <= 9; i++) {
-		if (my_active_card[makeCardName('B', i)] > max_card_num) {
-			max_card_num = my_active_card[makeCardName('B', i)];
-			most_card = makeCardName('B', i);
-		}
-		if (my_active_card[makeCardName('W', i)] > max_card_num) {
-			max_card_num = my_active_card[makeCardName('W', i)];
-			most_card = makeCardName('W', i);
-		}
-		if (my_active_card[makeCardName('T', i)] > max_card_num) {
-			max_card_num = my_active_card[makeCardName('T', i)];
-			most_card = makeCardName('T', i);
-		}
-	}
-	for (int i = 1; i <= 4; i++) {
-		if (my_active_card[makeCardName('F', i)] > max_card_num) {
-			max_card_num = my_active_card[makeCardName('F', i)];
-			most_card = makeCardName('F', i);
-		}
-	}
-	for (int i = 1; i <= 3; i++) {
-		if (my_active_card[makeCardName('J', i)] > max_card_num) {
-			max_card_num = my_active_card[makeCardName('J', i)];
-			most_card = makeCardName('J', i);
-		}
-	}
-	return most_card;
-}
-
 
 /**
  * 初始化现在的情况
@@ -1179,6 +1103,9 @@ string initCondition() {
 					if (i == turn_id)
 						return str_tmp;
 				}
+            } else if (str_tmp == "DRAW") {
+			    //处理摸牌情况，记录排山的减少
+                left_card_num[player_id]--;
 			}
 			//else if (str_tmp == "BUHUA" && player_id == my_player_id) {
 			//flower_count++;
@@ -1382,8 +1309,7 @@ void playCard() {
 	else if (tmpbool) {
 		//如果胡了但是番数没到
 		//str_out << getFan();
-		string best_card_hu = bu_dian_pao();
-		str_out << "PLAY " << best_card_hu;
+		str_out << "HU";
 	}
 	else {
 		//这里是原erase的位置
@@ -1425,62 +1351,60 @@ void responseOutTurn() {
 	if (itmp != my_player_id) {
 		//str_in >> stmp >> stmp;
 		//一下是调试代码
-		//if (checkHu(all_card[my_player_id], stmp)) {
-		//	str_out << "HU";
+		if (checkHu(all_card[my_player_id], stmp)) {
+			str_out << "HU";
 			//str_out << getFan();
-		//	return;
-		//}
+			return;
+		}
 		//以上是调试代码
-		//if (checkHu(all_card[my_player_id], stmp)) {
-		//	str_out << "PASS";
-		//	return;
-		//}
 		//如果可以抢牌胡
 		if (checkHu(all_card[my_player_id], stmp) && getFan() >= 8) {
 			str_out << "HU";
-		}
-		else if (checkHu(all_card[my_player_id], stmp)) {
-			str_out << "PASS";
-		}
+        } else if (left_card_num[(itmp + 1) % 4] == 0) {
+            //针对复式赛制的牌荒问题，如果发现当前玩家的下家已经没牌了
+            str_out << "PASS";
+            return;
+        }
 		//可以抢牌杠
-		else if (checkGang(stmp)) {
-			str_out << "GANG";
-		}
-		//碰完就是否一定成功？ 这里是个问题
-		//可以碰
-		else if (checkPeng(stmp)) {
-			str_out << "PENG ";
-			//把PENG的牌处理一下
-			for (int k = 1; k <= 2; k++)
-				all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
-			peng.push_back(stmp);
-			int pre_Playerid;	//上回合出牌的玩家
-			str_in.clear();
-			str_in.str(request[turn_id - 1]);
-			str_in >> pre_Playerid >> pre_Playerid;
-			my_pack.push_back(makePack("PENG", stmp, pre_Playerid));
-			//更新map
-			setMyCard(my_player_id);
-			stmp = getBestCard();
-			str_out << stmp;
-		}
-		else if (itmp == (my_player_id + 3) % 4 &&  checkChi(stmp) != "Fail") {
-			//stmp存了吃的牌的中间的牌
-			string value = stmp;
-			
-			stmp = checkChi(stmp);
-			all_card[my_player_id].push_back(value);//先存进来之后三个一起erase
-			//三个erase
-			all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), previousCard(stmp)));
-			all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
-			all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), postCard(stmp)));
-			str_out << "CHI " << stmp << " ";
-			stmp = getBestCard();
-			str_out << stmp;
-		}
-		else {
-			str_out << "PASS";
-		}
+        else if (checkGang(stmp)) {
+            str_out << "GANG";
+        }
+        //碰完就是否一定成功？ 这里是个问题
+        //可以碰
+        else if (checkPeng(stmp)) {
+            str_out << "PENG ";
+
+            //把PENG的牌处理一下
+            for (int k = 1; k <= 2; k++)
+                all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
+            peng.push_back(stmp);
+            int pre_Playerid;    //上回合出牌的玩家
+            str_in.clear();
+            str_in.str(request[turn_id - 1]);
+            str_in >> pre_Playerid >> pre_Playerid;
+            my_pack.push_back(makePack("PENG", stmp, pre_Playerid));
+            //更新map
+            setMyCard(my_player_id);
+            stmp = getBestCard();
+            str_out << stmp;
+        } else if (itmp == (my_player_id + 3) % 4 && checkChi(stmp) != "Fail") {
+            //stmp存了吃的牌的中间的牌
+            string value = stmp;
+
+            stmp = checkChi(stmp);
+            all_card[my_player_id].push_back(value);//先存进来之后三个一起erase
+            //三个erase
+            all_card[my_player_id].erase(
+                    find(all_card[my_player_id].begin(), all_card[my_player_id].end(), previousCard(stmp)));
+            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
+            all_card[my_player_id].erase(
+                    find(all_card[my_player_id].begin(), all_card[my_player_id].end(), postCard(stmp)));
+            str_out << "CHI " << stmp << " ";
+            stmp = getBestCard();
+            str_out << stmp;
+        } else {
+            str_out << "PASS";
+        }
 	}
 	else {
 		str_out << "PASS";
@@ -1501,7 +1425,7 @@ int main() {
 	cin >> input_json;
     //==========debug============
     //Json::Reader reader;
-    //string myin = string("{\"requests\":[\"0 0 0\",\"1 0 0 0 0 F3 W3 T7 T5 W8 W2 F4 W2 B1 B9 T4 T3 W2\",\"2 T7\",\"3 0 PLAY F3\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"3 2 DRAW\",\"3 2 PLAY J1\",\"3 3 DRAW\",\"3 3 PLAY J1\",\"2 W4\",\"3 0 PLAY F4\",\"3 1 DRAW\",\"3 1 PLAY F4\",\"3 2 DRAW\",\"3 2 PLAY J1\",\"3 3 DRAW\",\"3 3 PLAY F3\",\"2 T4\",\"3 0 PLAY B1\",\"3 1 DRAW\",\"3 1 PLAY B9\",\"3 2 DRAW\",\"3 2 PLAY F2\",\"3 1 PENG T9\",\"3 2 DRAW\",\"3 2 PLAY T8\",\"3 3 DRAW\",\"3 3 PLAY J3\",\"2 T7\",\"3 0 PLAY B9\",\"3 1 DRAW\",\"3 1 PLAY T2\",\"3 2 DRAW\",\"3 2 PLAY T4\",\"3 0 PENG W8\",\"3 1 DRAW\",\"3 1 PLAY B3\",\"3 2 CHI B2 T1\",\"3 3 DRAW\",\"3 3 PLAY T8\",\"2 W9\",\"3 0 PLAY W9\",\"3 1 DRAW\",\"3 1 PLAY B8\",\"3 2 DRAW\",\"3 2 PLAY B6\",\"3 3 CHI B5 B5\",\"2 B5\",\"3 0 PLAY B5\",\"3 1 DRAW\",\"3 1 PLAY B1\",\"3 2 DRAW\",\"3 2 PLAY B5\",\"3 3 DRAW\",\"3 3 PLAY W7\",\"2 T9\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY T6\",\"3 2 DRAW\",\"3 2 PLAY B2\",\"3 3 DRAW\",\"3 3 PLAY B2\",\"2 F3\",\"3 0 PLAY F3\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"3 2 DRAW\",\"3 2 PLAY F1\",\"3 3 DRAW\",\"3 3 PLAY B8\",\"2 F4\",\"3 0 PLAY F4\",\"3 1 DRAW\",\"3 1 PLAY B8\",\"3 2 DRAW\",\"3 2 PLAY J3\",\"3 3 DRAW\",\"3 3 PLAY B3\",\"2 W2\",\"3 0 GANG\",\"2 T6\",\"3 0 PLAY W3\",\"3 1 DRAW\",\"3 1 PLAY F3\",\"3 2 DRAW\",\"3 2 PLAY T4\",\"3 3 DRAW\",\"3 3 PLAY B1\",\"2 T8\",\"3 0 PLAY T5\",\"3 1 DRAW\",\"3 1 PLAY T5\",\"3 2 DRAW\",\"3 2 PLAY T9\",\"3 3 DRAW\",\"3 3 PLAY T2\",\"2 J2\",\"3 0 PLAY J2\",\"3 2 PENG W1\",\"3 3 DRAW\",\"3 3 PLAY F1\",\"2 F4\",\"3 0 PLAY F4\",\"3 1 DRAW\",\"3 1 PLAY B3\",\"3 2 DRAW\",\"3 2 PLAY W4\",\"3 3 CHI W4 B6\",\"2 W4\",\"3 0 PLAY W4\",\"3 1 CHI W4 W1\",\"3 2 DRAW\",\"3 2 PLAY W1\",\"3 3 DRAW\",\"3 3 PLAY B6\",\"2 T5\",\"3 0 PLAY T5\",\"3 1 DRAW\",\"3 1 PLAY B7\",\"3 2 DRAW\",\"3 2 PLAY B2\",\"3 3 DRAW\",\"3 3 PLAY T8\",\"3 0 CHI T7 T7\",\"3 1 DRAW\",\"3 1 PLAY W5\",\"3 2 CHI W6 W7\",\"3 3 DRAW\",\"3 3 PLAY T6\",\"2 F1\",\"3 0 PLAY F1\",\"3 1 DRAW\",\"3 1 PLAY T9\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"3 3 DRAW\",\"3 3 PLAY T5\",\"2 T6\",\"3 0 PLAY T6\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY W9\",\"3 3 DRAW\",\"3 3 PLAY B7\",\"2 W1\",\"3 0 PLAY W1\",\"3 1 DRAW\",\"3 1 PLAY T3\",\"3 2 DRAW\",\"3 2 PLAY B6\",\"3 3 DRAW\",\"3 3 PLAY F1\",\"2 T7\",\"3 0 PLAY T7\",\"3 1 DRAW\",\"3 1 PLAY W8\",\"3 2 PENG B4\",\"3 3 DRAW") + string("\",\"3 3 PLAY J2\",\"2 B7\",\"3 0 PLAY B7\",\"3 1 CHI B8 B7\",\"3 2 DRAW\",\"3 2 PLAY B4\",\"3 3 DRAW\",\"3 3 PLAY B3\"],\"responses\":[\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PENG W8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"GANG W2\",\"PASS\",\"PLAY W3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY J2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"CHI T7 T7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T6\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
+    //string myin =
     //reader.parse(myin, input_json);
     //==========debug============
 	//当前回合的下标（即总共回合数量-1）
