@@ -78,20 +78,7 @@ string makeCardName(char type, int number) {
 	return string(d);
 }
 
-/*获取牌堆中剩下的牌*/
-void getRestCard() {
-	for (int i = 1; i <= 9; i++) {
-		rest_card[makeCardName('W', i)] = 4-getCardNumAll(makeCardName('W', i));
-		rest_card[makeCardName('B', i)] = 4-getCardNumAll(makeCardName('B', i));
-		rest_card[makeCardName('T', i)] = 4-getCardNumAll(makeCardName('T', i));
-	}
-	for (int i = 1; i <= 4; i++) {
-		rest_card[makeCardName('F', i)] = 4-getCardNumAll(makeCardName('F', i));
-	}
-	for (int i = 1; i <= 3; i++) {
-		rest_card[makeCardName('J', i)] = 4-getCardNumAll(makeCardName('J', i));
-	}
-}
+
 
 /**
  * 生成上一张牌的名字
@@ -157,6 +144,20 @@ int getCardNumAll(string card_name) {
 		}
 	}
 	return _cnt;
+}
+/*获取牌堆中剩下的牌*/
+void getRestCard() {
+	for (int i = 1; i <= 9; i++) {
+		rest_card[makeCardName('W', i)] = 4 - getCardNumAll(makeCardName('W', i));
+		rest_card[makeCardName('B', i)] = 4 - getCardNumAll(makeCardName('B', i));
+		rest_card[makeCardName('T', i)] = 4 - getCardNumAll(makeCardName('T', i));
+	}
+	for (int i = 1; i <= 4; i++) {
+		rest_card[makeCardName('F', i)] = 4 - getCardNumAll(makeCardName('F', i));
+	}
+	for (int i = 1; i <= 3; i++) {
+		rest_card[makeCardName('J', i)] = 4 - getCardNumAll(makeCardName('J', i));
+	}
 }
 
 /**
@@ -1120,28 +1121,12 @@ map<string, int> easy_make_map(vector<string>::iterator start, vector<string>::i
 
 //是不是相邻的牌。如B4,B5返回true，B3,B5分会false
 bool adjacent_card(string card1, string card2) {
-	if (card1[0] == card2[0] && （card2[1] - card1[1] == 1 || card2[1] - card1[1] == -1）)
+	if (card1[0] == card2[0] && (card2[1] - card1[1] == 1 || card2[1] - card1[1] == -1))
 		return true;
 	return false;
 }
 
 
-/**
- * 获取牌堆中剩下的牌
- */
-void setRestCard() {
-	for (int i = 0; i <= 9; i++) {
-		rest_card[makeCardName('W', i)] = 4-getCardNumAll(makeCardName('W', i));
-		rest_card[makeCardName('B', i)] = 4-getCardNumAll(makeCardName('B', i));
-		rest_card[makeCardName('T', i)] = 4-getCardNumAll(makeCardName('T', i));
-	}
-	for (int i = 0; i < 4; i++) {
-		rest_card[makeCardName('F', i)] = 4-getCardNumAll(makeCardName('F', i));
-	}
-	for (int i = 0; i < 3; i++) {
-		rest_card[makeCardName('J', i)] = 4-getCardNumAll(makeCardName('J', i));
-	}
-}
 
 /**
  * 挑选一张最适合出牌的牌
