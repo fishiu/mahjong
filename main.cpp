@@ -63,7 +63,8 @@ unordered_map<string, int>all_rest_card;
 //存我的手牌的排序形式
 vector<string> sorted_my_card;
 
-
+//下面是为了复式赛制增加的解决牌荒问题的变量
+int left_card_num[4] = {21, 21, 21, 21}; //34张初始发掉13张剩下21张
 
 /**
  * 快速生成牌名，注意是char
@@ -1179,6 +1180,9 @@ string initCondition() {
                     if (i == turn_id)
                         return str_tmp;
                 }
+            } else if (str_tmp == "DRAW") {
+                //处理摸牌情况，记录排山的减少
+                left_card_num[player_id]--;
             }
             //else if (str_tmp == "BUHUA" && player_id == my_player_id) {
             //flower_count++;
@@ -1438,11 +1442,12 @@ void responseOutTurn() {
         //如果可以抢牌胡
         if (checkHu(all_card[my_player_id], stmp) && getFan() >= 8) {
             str_out << "HU";
-        }
-        else if (checkHu(all_card[my_player_id], stmp)) {
+        } else if (left_card_num[(itmp + 1) % 4] == 0) {
+            //针对复式赛制的牌荒问题，如果发现当前玩家的下家已经没牌了
             str_out << "PASS";
+            return;
         }
-            //可以抢牌杠
+        //可以抢牌杠
         else if (checkGang(stmp)) {
             str_out << "GANG";
         }
