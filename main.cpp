@@ -58,6 +58,8 @@ vector<string> chi;
 vector<string> gang;
 //存我目前信息下牌墙中剩的牌
 unordered_map<string, int>rest_card;
+//存我目前信息下牌墙中剩的牌
+unordered_map<string, int>all_rest_card;
 //存我的手牌的排序形式
 vector<string> sorted_my_card;
 
@@ -145,7 +147,7 @@ int getCardNumAll(string card_name) {
 	}
 	return _cnt;
 }
-/*获取牌堆中剩下的牌*/
+/*获取牌堆中剩下的牌 + 别人手中的牌*/
 void getRestCard() {
 	for (int i = 1; i <= 9; i++) {
 		rest_card[makeCardName('W', i)] = 4 - getCardNumAll(makeCardName('W', i));
@@ -157,6 +159,21 @@ void getRestCard() {
 	}
 	for (int i = 1; i <= 3; i++) {
 		rest_card[makeCardName('J', i)] = 4 - getCardNumAll(makeCardName('J', i));
+	}
+}
+
+//和getrestcard相反，是已经有的牌的数量
+void getAllCard() {
+	for (int i = 1; i <= 9; i++) {
+		all_rest_card[makeCardName('W', i)] = getCardNumAll(makeCardName('W', i));
+		all_rest_card[makeCardName('B', i)] = getCardNumAll(makeCardName('B', i));
+		all_rest_card[makeCardName('T', i)] = getCardNumAll(makeCardName('T', i));
+	}
+	for (int i = 1; i <= 4; i++) {
+		all_rest_card[makeCardName('F', i)] = getCardNumAll(makeCardName('F', i));
+	}
+	for (int i = 1; i <= 3; i++) {
+		all_rest_card[makeCardName('J', i)] = getCardNumAll(makeCardName('J', i));
 	}
 }
 
@@ -830,6 +847,66 @@ int getFan() {
 
 	return sum;
 }
+/*不点炮*/
+//目标是输入一副胡牌牌型，输出
+string bu_dian_pao() {
+	//有一个all_rest_card的map
+	getAllCard();
+	setMyCard(my_player_id);
+	//先把我没有的牌删了,即all_rest_card记为-1，接下来就输出all_rest_card比较多的牌
+	for (int i = 1; i <= 9; i++) {
+		if (my_active_card[makeCardName('W', i)] == 0) {
+			all_rest_card[makeCardName('W', i)] = -1;
+		}
+		if (my_active_card[makeCardName('B', i)] == 0) {
+			all_rest_card[makeCardName('B', i)] = -1;
+		}
+		if (my_active_card[makeCardName('T', i)] == 0) {
+			all_rest_card[makeCardName('T', i)] = -1;
+		}
+	}
+	for (int i = 1; i <= 4; i++) {
+		if (my_active_card[makeCardName('F', i)] == 0) {
+			all_rest_card[makeCardName('F', i)] = -1;
+		}
+	}
+	for (int i = 1; i <= 3; i++) {
+		if (my_active_card[makeCardName('J', i)] == 0) {
+			all_rest_card[makeCardName('J', i)] = -1;
+		}
+	}
+	string most_card = "error";
+	int max_card_num = -1;
+	
+	for (int i = 1; i <= 9; i++) {
+		if (my_active_card[makeCardName('B', i)] > max_card_num) {
+			max_card_num = my_active_card[makeCardName('B', i)];
+			most_card = makeCardName('B', i);
+		}
+		if (my_active_card[makeCardName('W', i)] > max_card_num) {
+			max_card_num = my_active_card[makeCardName('W', i)];
+			most_card = makeCardName('W', i);
+		}
+		if (my_active_card[makeCardName('T', i)] > max_card_num) {
+			max_card_num = my_active_card[makeCardName('T', i)];
+			most_card = makeCardName('T', i);
+		}
+	}
+	for (int i = 1; i <= 4; i++) {
+		if (my_active_card[makeCardName('F', i)] > max_card_num) {
+			max_card_num = my_active_card[makeCardName('F', i)];
+			most_card = makeCardName('F', i);
+		}
+	}
+	for (int i = 1; i <= 3; i++) {
+		if (my_active_card[makeCardName('J', i)] > max_card_num) {
+			max_card_num = my_active_card[makeCardName('J', i)];
+			most_card = makeCardName('J', i);
+		}
+	}
+	return most_card;
+}
+
 
 /**
  * 初始化现在的情况
@@ -1305,7 +1382,8 @@ void playCard() {
 	else if (tmpbool) {
 		//如果胡了但是番数没到
 		//str_out << getFan();
-		str_out << "HU";
+		string best_card_hu = bu_dian_pao();
+		str_out << "PLAY " << best_card_hu;
 	}
 	else {
 		//这里是原erase的位置
@@ -1347,15 +1425,22 @@ void responseOutTurn() {
 	if (itmp != my_player_id) {
 		//str_in >> stmp >> stmp;
 		//一下是调试代码
-		if (checkHu(all_card[my_player_id], stmp)) {
-			str_out << "HU";
+		//if (checkHu(all_card[my_player_id], stmp)) {
+		//	str_out << "HU";
 			//str_out << getFan();
-			return;
-		}
+		//	return;
+		//}
 		//以上是调试代码
+		//if (checkHu(all_card[my_player_id], stmp)) {
+		//	str_out << "PASS";
+		//	return;
+		//}
 		//如果可以抢牌胡
 		if (checkHu(all_card[my_player_id], stmp) && getFan() >= 8) {
 			str_out << "HU";
+		}
+		else if (checkHu(all_card[my_player_id], stmp)) {
+			str_out << "PASS";
 		}
 		//可以抢牌杠
 		else if (checkGang(stmp)) {
@@ -1365,7 +1450,6 @@ void responseOutTurn() {
 		//可以碰
 		else if (checkPeng(stmp)) {
 			str_out << "PENG ";
-
 			//把PENG的牌处理一下
 			for (int k = 1; k <= 2; k++)
 				all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
