@@ -61,41 +61,7 @@ unordered_map<string, int>rest_card;
 //存我的手牌的排序形式
 vector<string> sorted_my_card;
 
-/*
-*计算一张牌亮出来过几次
-*/
-int getCardNumAll(string card_name) {
-	int _cnt = 0;
-	for (int i = 0; i < 5; ++i) {
-		for (int j = 0; j < all_card[i].size(); ++j) {
-			if (all_card[i][j] == card_name) {
-				_cnt++;
-			}
-		}
-	}
-	for (int i = 0; i < peng.size(); i++) {
-		if (peng[i] == card_name) {
-			cnt += 3;
-		}
-	}
-	for (int i = 0; i < gang.size(); i++) {
-		if (gang[i] == card_name) {
-			cnt += 4;
-		}
-	}
-	for (int i = 0; i < chi.size(); i++) {
-		if (chi[i] == card_name) {
-			cnt ++;
-		}
-		if (postCard(chi[i]) == card_name) {
-			cnt++;
-		}
-		if (previousCard(chi[i]) == card_name) {
-			cnt++;
-		}
-	}
-	return _cnt;
-}
+
 
 /**
  * 快速生成牌名，注意是char
@@ -155,6 +121,42 @@ string postCard(string card_name) {
 	tmp_string[2] = 0;
 	string s1 = string(tmp_string);
 	return s1;
+}
+
+/*
+*计算一张牌亮出来过几次
+*/
+int getCardNumAll(string card_name) {
+	int _cnt = 0;
+	for (int i = 0; i < 5; ++i) {
+		for (int j = 0; j < all_card[i].size(); ++j) {
+			if (all_card[i][j] == card_name) {
+				_cnt++;
+			}
+		}
+	}
+	for (int i = 0; i < peng.size(); i++) {
+		if (peng[i] == card_name) {
+			_cnt += 3;
+		}
+	}
+	for (int i = 0; i < gang.size(); i++) {
+		if (gang[i] == card_name) {
+			_cnt += 4;
+		}
+	}
+	for (int i = 0; i < chi.size(); i++) {
+		if (chi[i] == card_name) {
+			_cnt++;
+		}
+		if (postCard(chi[i]) == card_name) {
+			_cnt++;
+		}
+		if (previousCard(chi[i]) == card_name) {
+			_cnt++;
+		}
+	}
+	return _cnt;
 }
 
 /**
