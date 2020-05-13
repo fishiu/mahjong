@@ -997,12 +997,15 @@ string initCondition() {
 
 				//暗杠的情况 上回合是自己摸排
 				if (record_type == 2) {
-					for (int k = 0; k < 4; k++) {
-						all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
+					//2 Card1
+					if (player_id == my_player_id) {
+						str_in >> str_tmp;
+						for (int k = 0; k < 4; k++) {
+							all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
+						}
+						gang.push_back(str_tmp);
+						my_pack.push_back(makePack("GANG", str_tmp, my_player_id));
 					}
-					str_in >> str_tmp;
-					gang.push_back(str_tmp);
-					my_pack.push_back(makePack("GANG", str_tmp, my_player_id));
 					/*if (prePlayerid == player_id) {
 
 						这里是改之前的原代码
@@ -1019,7 +1022,7 @@ string initCondition() {
 					str_in >> prePlayerid;
 					str_tmp = all_card[4][all_card[4].size() - 1]; //gang的牌
 					if (my_player_id == player_id) {
-						for (int k = 0; k < 4; k++) {
+						for (int k = 0; k < 3; k++) {
 							all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
 						}
 						gang.push_back(str_tmp);
