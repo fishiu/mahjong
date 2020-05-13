@@ -116,6 +116,7 @@ string previousCard(string card_name) {
 	char tmp_string[2];
 	tmp_string[0] = card_name[0];
 	tmp_string[1] = tmp;
+	tmp_string[2] = 0;
 	string s1 = string(tmp_string);
 	return s1;
 }
@@ -130,6 +131,7 @@ string postCard(string card_name) {
 	char tmp_string[2];
 	tmp_string[0] = card_name[0];
 	tmp_string[1] = tmp;
+	tmp_string[2] = 0;
 	string s1 = string(tmp_string);
 	return s1;
 }
@@ -955,7 +957,7 @@ string initCondition() {
 					//其他操作 打出的牌是第四个string
 					else 
 						str_in >> str_temp2;
-					//str_out << str_temp2 << str_tmp;
+					//str_out << str_temp2 << str_tmp << " ";
 					if (str_temp2 == previousCard(str_tmp)) {
 						Chi_position = 1;
 					}
@@ -966,8 +968,9 @@ string initCondition() {
 						Chi_position = 2;
 					}
 					my_pack.push_back(makePack("CHI", str_tmp, Chi_position));
-					all_card[player_id].push_back(str_tmp);
+					all_card[player_id].push_back(str_temp2);
 					//str_out << Chi_position;
+					//str_out << postCard(str_tmp) << "\n";
 					//hand里面调整
 					all_card[player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), previousCard(str_tmp)));
 					all_card[player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
@@ -1122,6 +1125,7 @@ void setRestCard() {
  * @return 最优的牌
  */
 string getBestCard() {
+	setMyCard(my_player_id);
 	//如果可以听牌还没写，写在这儿
 	string ting = checkTing();
 	if (ting != "Fail") {
