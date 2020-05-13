@@ -1051,6 +1051,7 @@ string initCondition() {
 					int prePlayerid;
 					str_in >> prePlayerid;
 					str_tmp = all_card[4][all_card[4].size() - 1]; //gang的牌
+					//这里改掉，不用all_card读gang的牌而是读上一回合
 					if (my_player_id == player_id) {
 						all_card[4].pop_back();
 						for (int k = 0; k < 3; k++) {
@@ -1168,19 +1169,21 @@ string getBestCard() {
 	for (int i = 2; i < len; i++) {
 		//如果不是连续的牌
 		if (all_card[my_player_id][i - 2] == all_card[my_player_id][i - 1] && all_card[my_player_id][i - 1] == all_card[my_player_id][i]) {
-			delete_card.push_back(all_card[my_player_id][i]);
-			delete_card.push_back(all_card[my_player_id][i]);
-			delete_card.push_back(all_card[my_player_id][i]);
+			all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i - 2]));
+			all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i - 1]));
+			all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i]));
 		}
-
 	}
 	for (int i = 2; i < len; i++) {
 		//如果不是顺子
 		if (adjacent_card(all_card[my_player_id][i - 2], all_card[my_player_id][i - 1]) && adjacent_card(all_card[my_player_id][i - 1], all_card[my_player_id][i]) && !(i - 3 > 0 && all_card[my_player_id][i - 2] == all_card[my_player_id][i - 3]
 			&& i + 1 < len && all_card[my_player_id][i + 1] == all_card[my_player_id][i])) {
-			delete_card.push_back(all_card[my_player_id][i - 2]);
-			delete_card.push_back(all_card[my_player_id][i - 1]);
-			delete_card.push_back(all_card[my_player_id][i]);
+			all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i - 2]));
+			all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i - 1]));
+			all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i]));
+			//delete_card.push_back(all_card[my_player_id][i - 2]);
+			//delete_card.push_back(all_card[my_player_id][i - 1]);
+			//delete_card.push_back(all_card[my_player_id][i]);
 		}
 	}
 	//再去掉222
