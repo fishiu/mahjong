@@ -345,13 +345,16 @@ string eraseSingle() {
     return "Fail";
 }
 
+int getFan(string);
+
 /**
  * 判断胡牌
  * @param Cards 手中的13张牌
  * @param gotCard 自己摸到的牌
- * @return 胡 true 不胡 false
+ * @return 番数
  */
-bool checkHu(vector<string> Cards,string gotCard) {
+int checkHu(vector<string> Cards,string gotCard) {
+    return getFan(gotCard);
     setMyCard(my_player_id);
 	unordered_map<string, int> newmap = my_active_card;
 	newmap[gotCard] = my_active_card[gotCard] + 1;
@@ -653,7 +656,7 @@ string checkTing() {
             getRestCard();
             //遍历牌墙剩下的牌
             for (auto i = rest_card.begin(); i != rest_card.end(); i++) {
-                if (i->second > 0 && checkHu(all_card[my_player_id], i->first)) {
+                if (i->second > 0 && checkHu(all_card[my_player_id], i->first) >= 8) {
                     sum += i->second;
                 }
             }
@@ -887,7 +890,7 @@ int player_id_to_position(int _player_id) {
  * 算番器
  * @return 番数
  */
-int getFan() {
+int getFan(string win_tile) {
     vector<pair<string, pair<string, int> > > pack;
     //计算pack
     for (int i = 0; i < my_pack.size(); ++i) {
@@ -919,7 +922,7 @@ int getFan() {
         vector<pair<int, string> > res = MahjongFanCalculator(
                 pack,
                 fan_hand,
-                current_card,
+                win_tile,
                 flower_count,
                 is_ZIMO,
                 is_JUEZHANG,
@@ -1470,12 +1473,12 @@ void playCard() {
     bool tmpbool = checkHu(all_card[my_player_id], stmp);
     //str_out << "HU";
     //return;
-    if (tmpbool && getFan() >= 8) {
+    if (tmpbool && getFan(current_card) >= 8) {
         str_out << "HU";
     }
     else if (tmpbool) {
         //如果胡了但是番数没到
-        //str_out << getFan();
+        //str_out << getFan(current_card);
         string best_card_hu = bu_dian_pao();
         str_out << "PLAY " << best_card_hu;
     }
@@ -1521,7 +1524,7 @@ void responseOutTurn() {
         //一下是调试代码
         //if (checkHu(all_card[my_player_id], stmp)) {
         //	str_out << "HU";
-        //str_out << getFan();
+        //str_out << getFan(current_card);
         //	return;
         //}
         //以上是调试代码
@@ -1530,7 +1533,7 @@ void responseOutTurn() {
         //	return;
         //}
         //如果可以抢牌胡
-        if (checkHu(all_card[my_player_id], stmp) && getFan() >= 8) {
+        if (checkHu(all_card[my_player_id], stmp) && getFan(stmp) >= 8) {
             str_out << "HU";
         } else if (checkHu(all_card[my_player_id], stmp)) {
             str_out << "PASS";
@@ -1597,11 +1600,11 @@ int main() {
     //
     //Json交互的输入（删掉了普通交互）
     Json::Value input_json;
-    cin >> input_json;
+//    cin >> input_json;
     //==========debug============
-//    Json::Reader reader;
-//    string myin = string("{\"requests\":[\"0 0 0\",\"1 0 0 0 0 W9 B3 B2 T9 B1 W5 W4 B5 W5 T4 T5 F3 W6\",\"2 B4\",\"3 0 PLAY F3\",\"3 1 DRAW\",\"3 1 PLAY F4\",\"3 2 DRAW\",\"3 2 PLAY F1\",\"3 3 DRAW\",\"3 3 PLAY F1\",\"2 T3\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"3 3 PENG F3\",\"2 W1\",\"3 0 PLAY W1\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY F4\",\"3 3 DRAW\",\"3 3 PLAY F4\",\"2 T1\",\"3 0 PLAY T1\",\"3 2 PENG B1\",\"3 3 DRAW\",\"3 3 PLAY F2\",\"2 J1\",\"3 0 PLAY W9\",\"3 1 PENG T9\",\"3 2 CHI T8 B4\",\"3 3 DRAW\",\"3 3 PLAY B8\",\"2 B7\",\"3 0 PLAY B4\",\"3 1 DRAW\",\"3 1 PLAY W7\",\"3 2 CHI W7 W7\",\"3 3 CHI W6 W2\",\"2 B3\",\"3 0 PLAY W5\",\"3 1 DRAW\",\"3 1 PLAY J2\",\"3 2 DRAW\",\"3 2 PLAY W8\",\"3 3 DRAW\",\"3 3 PLAY B4\",\"2 B6\"],\"responses\":[\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
-//    reader.parse(myin, input_json);
+    Json::Reader reader;
+    string myin = string("{\"requests\":[\"0 1 0\",\"1 0 0 0 0 W4 T4 T3 T9 F3 W2 W4 T4 T5 B2 B8 T4 T5\",\"3 0 DRAW\",\"3 0 PLAY W9\",\"2 B8\",\"3 1 PLAY F3\",\"3 2 DRAW\",\"3 2 PLAY F1\",\"3 3 DRAW\",\"3 3 PLAY J2\",\"3 0 DRAW\",\"3 0 PLAY J2\",\"2 B8\",\"3 1 PLAY T9\",\"3 2 CHI T8 F4\",\"3 3 DRAW\",\"3 3 PLAY B1\",\"3 0 DRAW\",\"3 0 PLAY B4\",\"2 B9\",\"3 1 PLAY W2\",\"3 2 DRAW\",\"3 2 PLAY W5\",\"3 3 DRAW\",\"3 3 PLAY T1\",\"3 0 DRAW\",\"3 0 PLAY W8\",\"2 T2\"],\"responses\":[\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
+    reader.parse(myin, input_json);
     //==========debug============
     //当前回合的下标（即总共回合数量-1）
     turn_id = input_json["responses"].size();
