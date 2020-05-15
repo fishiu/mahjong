@@ -1322,7 +1322,7 @@ bool adjacent_card(string card1, string card2) {
 
 //去除无效的排，即不可能拿到的双排
 string eraseVoid() {
-	setMyCard();
+	setMyCard(my_player_id);
 	int i = 1, j = 9;
 	for (; i <= j; i++, j--) {
 		if (my_active_card[makeCardName('W', i)] > 0 && my_active_card[makeCardName('W', i)]  + getCardNumAll(makeCardName('W', i))== 4) {
@@ -1340,7 +1340,7 @@ string eraseVoid() {
 		if (my_active_card[makeCardName('T', i)] > 0 && my_active_card[makeCardName('T', i)] + getCardNumAll(makeCardName('T', i)) == 4) {
 			return makeCardName('T', i);
 		}
-		if (j != i && my_active_card[makeCardName('T', j)] > 0 && my_active_card[makeCardName('T', j)] + getCardNumAll[makeCardName('T', j)] == 4) {
+		if (j != i && my_active_card[makeCardName('T', j)] > 0 && my_active_card[makeCardName('T', j)] + getCardNumAll(makeCardName('T', j)) == 4) {
 			return makeCardName('T', j);
 		}
 		
