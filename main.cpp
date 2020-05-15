@@ -1485,7 +1485,7 @@ void playCard() {
         setMyCard(my_player_id);
         //bugang
         if (find(peng.begin(), peng.end(), stmp) != peng.end()) {
-            peng.erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
+            //这句多余peng.erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
             gang.push_back(stmp);
             str_out << "BUGANG " << stmp;
             return;
