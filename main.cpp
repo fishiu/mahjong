@@ -949,7 +949,7 @@ int getFan(string win_tile) {
         // 记录番数的和
         int sum = 0;
         for (int i = 0; i < res.size(); ++i) { //遍历每一个番种
-            res[i].first += sum;
+            sum += res[i].first;
         }
         return sum;
     }catch(const string &error){
