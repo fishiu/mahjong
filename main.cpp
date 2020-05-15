@@ -1322,21 +1322,22 @@ bool adjacent_card(string card1, string card2) {
 
 //去除无效的排，即不可能拿到的双排
 string eraseVoid() {
+	setMyCard();
 	int i = 1, j = 9;
 	for (; i <= j; i++, j--) {
-		if (my_active_card[makeCardName('W', i)] > 0 && my_active_card[makeCardName('W', i)]  + getCardNumAll[makeCardName('W', i)]== 4) {
+		if (my_active_card[makeCardName('W', i)] > 0 && my_active_card[makeCardName('W', i)]  + getCardNumAll(makeCardName('W', i))== 4) {
 			return makeCardName('W', i);
 		}
-		if (j != i && my_active_card[makeCardName('W', j)]  > 0 && my_active_card[makeCardName('W', j)] + getCardNumAll[makeCardName('W', j)] == 4) {
+		if (j != i && my_active_card[makeCardName('W', j)]  > 0 && my_active_card[makeCardName('W', j)] + getCardNumAll(makeCardName('W', j)) == 4) {
 			return makeCardName('W', j);
 		}
-		if (my_active_card[makeCardName('B', i)] > 0 && my_active_card[makeCardName('B', i)] + getCardNumAll[makeCardName('B', i)] == 4) {
+		if (my_active_card[makeCardName('B', i)] > 0 && my_active_card[makeCardName('B', i)] + getCardNumAll(makeCardName('B', i)) == 4) {
 			return makeCardName('B', i);
 		}
-		if (j != i && my_active_card[makeCardName('B', j)] > 0 && my_active_card[makeCardName('B', j)] + getCardNumAll[makeCardName('B', j)] == 4) {
+		if (j != i && my_active_card[makeCardName('B', j)] > 0 && my_active_card[makeCardName('B', j)] + getCardNumAll(makeCardName('B', j)) == 4) {
 			return makeCardName('B', j);
 		}
-		if (my_active_card[makeCardName('T', i)] > 0 && my_active_card[makeCardName('T', i)] + getCardNumAll[makeCardName('T', i)] == 4) {
+		if (my_active_card[makeCardName('T', i)] > 0 && my_active_card[makeCardName('T', i)] + getCardNumAll(makeCardName('T', i)) == 4) {
 			return makeCardName('T', i);
 		}
 		if (j != i && my_active_card[makeCardName('T', j)] > 0 && my_active_card[makeCardName('T', j)] + getCardNumAll[makeCardName('T', j)] == 4) {
@@ -1349,7 +1350,7 @@ string eraseVoid() {
 
 //删除两张的牌
 string eraseTwo() {
-	vector v<string>;
+	vector<string> v;
 	for (int i = 1; i <= 9; i++) {
 		if (my_active_card[makeCardName('W', i)] > 0 && my_active_card[makeCardName('W', i)] < 3) {
 			v.push_back(makeCardName('W', i));
