@@ -35,5 +35,5 @@
 *.DS_Store
 
 # Covers JetBrains IDEs: CLion
-# /.idea
+/.idea
 /cmake-build-debug
