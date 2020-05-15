@@ -705,8 +705,8 @@ string single() {
 		if (j != i && my_active_card[makeCardName('B', j)] == 1) {
 			return makeCardName('B', j);
 		}
-		if (my_active_card[makeCardName('T', j)] == 1) {
-			return makeCardName('T', j);
+		if (my_active_card[makeCardName('T', i)] == 1) {
+			return makeCardName('T', i);
 		}
 		if (j != i && my_active_card[makeCardName('T', j)] == 1) {
 			return makeCardName('T', j);
@@ -1323,28 +1323,38 @@ bool adjacent_card(string card1, string card2) {
 //去除无效的排，即不可能拿到的双排
 string eraseVoid() {
 	setMyCard(my_player_id);
+	for (int i = 1; i <= 4; i++) {
+		if (my_active_card[makeCardName('F', i)] == 2 && my_active_card[makeCardName('F', i)] + getCardNumAll(makeCardName('F', i)) == 4) {
+			return makeCardName('F', i);
+		}
+	}
+	for (int i = 1; i <= 3; i++) {
+		if (my_active_card[makeCardName('J', i)] == 2 && my_active_card[makeCardName('J', i)] + getCardNumAll(makeCardName('J', i)) == 4) {
+			return makeCardName('J', i);
+		}
+	}
 	int i = 1, j = 9;
 	for (; i <= j; i++, j--) {
-		if (my_active_card[makeCardName('W', i)] > 0 && my_active_card[makeCardName('W', i)]  + getCardNumAll(makeCardName('W', i))== 4) {
+		if (my_active_card[makeCardName('W', i)] ==  2 && my_active_card[makeCardName('W', i)]  + getCardNumAll(makeCardName('W', i))== 4) {
 			return makeCardName('W', i);
 		}
-		if (j != i && my_active_card[makeCardName('W', j)]  > 0 && my_active_card[makeCardName('W', j)] + getCardNumAll(makeCardName('W', j)) == 4) {
+		if (j != i && my_active_card[makeCardName('W', j)]  ==2 && my_active_card[makeCardName('W', j)] + getCardNumAll(makeCardName('W', j)) == 4) {
 			return makeCardName('W', j);
 		}
-		if (my_active_card[makeCardName('B', i)] > 0 && my_active_card[makeCardName('B', i)] + getCardNumAll(makeCardName('B', i)) == 4) {
+		if (my_active_card[makeCardName('B', i)] ==2 && my_active_card[makeCardName('B', i)] + getCardNumAll(makeCardName('B', i)) == 4) {
 			return makeCardName('B', i);
 		}
-		if (j != i && my_active_card[makeCardName('B', j)] > 0 && my_active_card[makeCardName('B', j)] + getCardNumAll(makeCardName('B', j)) == 4) {
+		if (j != i && my_active_card[makeCardName('B', j)] == 2  && my_active_card[makeCardName('B', j)] + getCardNumAll(makeCardName('B', j)) == 4) {
 			return makeCardName('B', j);
 		}
-		if (my_active_card[makeCardName('T', i)] > 0 && my_active_card[makeCardName('T', i)] + getCardNumAll(makeCardName('T', i)) == 4) {
+		if (my_active_card[makeCardName('T', i)] ==2 && my_active_card[makeCardName('T', i)] + getCardNumAll(makeCardName('T', i)) == 4) {
 			return makeCardName('T', i);
 		}
-		if (j != i && my_active_card[makeCardName('T', j)] > 0 && my_active_card[makeCardName('T', j)] + getCardNumAll(makeCardName('T', j)) == 4) {
+		if (j != i && my_active_card[makeCardName('T', j)] ==2 && my_active_card[makeCardName('T', j)] + getCardNumAll(makeCardName('T', j)) == 4) {
 			return makeCardName('T', j);
 		}
-		
 	}
+	
 	return "Fail";
 }
 
