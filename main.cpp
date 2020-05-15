@@ -1541,13 +1541,19 @@ void responseOutTurn() {
 
             stmp = checkChi(stmp);
             all_card[my_player_id].push_back(value);//先存进来之后三个一起erase
-            //三个erase
-            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), previousCard(stmp)));
-            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
-            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), postCard(stmp)));
-            str_out << "CHI " << stmp << " ";
-            stmp = getBestCard();
-            str_out << stmp;
+			//这里新加
+			//如果能听牌就吃
+			if (checkTing() != "Fail") {
+				//三个erase
+				all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), previousCard(stmp)));
+				all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
+				all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), postCard(stmp)));
+				str_out << "CHI " << stmp << " ";
+				stmp = getBestCard();
+				str_out << stmp;
+			}
+			else
+				str_out << "PASS";
         }
         else {
             str_out << "PASS";
