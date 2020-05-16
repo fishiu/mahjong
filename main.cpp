@@ -1443,11 +1443,11 @@ string getBestCard() {
     if (fj != "Fail") {
         return fj;
     }
-    //从两头向中间除去间隔两个空位的单牌
-    string esdouble = eraseDouble();
-    if (esdouble != "Fail") {
-        return esdouble;
-    }
+//    //从两头向中间除去间隔两个空位的单牌
+//    string esdouble = eraseDouble();
+//    if (esdouble != "Fail") {
+//        return esdouble;
+//    }
 //    //从两头向中间除去间隔一个空位的单牌
 //    string es = eraseSingle();
 //    if (es != "Fail") {
