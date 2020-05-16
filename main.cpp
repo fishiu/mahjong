@@ -1628,12 +1628,15 @@ int main() {
     //
     //Json交互的输入（删掉了普通交互）
     Json::Value input_json;
+#ifdef _BOTZONE_ONLINE
     cin >> input_json;
+#else
     //==========debug============
-    // Json::Reader reader;
-    //string myin = string("{\"requests\":[\"0 1 0\",\"1 0 0 0 0 W4 T4 T3 T9 F3 W2 W4 T4 T5 B2 B8 T4 T5\",\"3 0 DRAW\",\"3 0 PLAY W9\",\"2 B8\",\"3 1 PLAY F3\",\"3 2 DRAW\",\"3 2 PLAY F1\",\"3 3 DRAW\",\"3 3 PLAY J2\",\"3 0 DRAW\",\"3 0 PLAY J2\",\"2 B8\",\"3 1 PLAY T9\",\"3 2 CHI T8 F4\",\"3 3 DRAW\",\"3 3 PLAY B1\",\"3 0 DRAW\",\"3 0 PLAY B4\",\"2 B9\",\"3 1 PLAY W2\",\"3 2 DRAW\",\"3 2 PLAY W5\",\"3 3 DRAW\",\"3 3 PLAY T1\",\"3 0 DRAW\",\"3 0 PLAY W8\",\"2 T2\"],\"responses\":[\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
-    //reader.parse(myin, input_json);
+    Json::Reader reader;
+    string myin = string("{\"requests\":[\"0 3 3\",\"1 0 0 0 0 B8 T3 W8 T8 T3 W4 F3 W9 W8 T8 F2 B3 B5\",\"3 0 DRAW\",\"3 0 PLAY J2\",\"3 1 DRAW\",\"3 1 PLAY J2\",\"3 2 DRAW\",\"3 2 PLAY B2\",\"2 B9\",\"3 3 PLAY F2\",\"3 0 DRAW\",\"3 0 PLAY J1\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY J1\",\"2 B7\",\"3 3 PLAY F3\",\"3 0 DRAW\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY F1\",\"3 2 DRAW\",\"3 2 PLAY F1\",\"2 T3\",\"3 3 PLAY W4\",\"3 0 DRAW\",\"3 0 PLAY T4\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"3 2 DRAW\",\"3 2 PLAY T9\",\"2 T8\",\"3 3 PLAY B3\",\"3 0 DRAW\",\"3 0 PLAY B5\",\"3 1 CHI B5 B1\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"2 W3\",\"3 3 PLAY W3\",\"3 0 DRAW\",\"3 0 PLAY B8\",\"3 1 DRAW\",\"3 1 PLAY W1\",\"3 2 DRAW\",\"3 2 PLAY B9\",\"3 3 CHI B8 B9\",\"3 0 DRAW\",\"3 0 PLAY T2\",\"3 1 DRAW\",\"3 1 PLAY B1\",\"3 2 DRAW\",\"3 2 PLAY W1\",\"2 J3\",\"3 3 PLAY J3\",\"3 0 DRAW\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY T1\",\"2 W4\",\"3 3 PLAY W4\",\"3 0 DRAW\",\"3 0 PLAY B2\",\"3 1 DRAW\",\"3 1 PLAY J2\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"2 W5\",\"3 3 PLAY W5\",\"3 0 DRAW\",\"3 0 PLAY W1\",\"3 1 DRAW\",\"3 1 PLAY W1\",\"3 2 DRAW\",\"3 2 PLAY T9\",\"2 W9\",\"3 3 PLAY B5\",\"3 0 DRAW\",\"3 0 PLAY W5\",\"3 1 DRAW\",\"3 1 PLAY W2\",\"3 2 DRAW\",\"3 2 PLAY F4\",\"2 W3\",\"3 3 PLAY W3\",\"3 0 DRAW\",\"3 0 PLAY W2\",\"3 1 DRAW\",\"3 1 PLAY F3\",\"3 2 DRAW\",\"3 2 PLAY T1\",\"2 B1\",\"3 3 PLAY B1\",\"3 0 DRAW\",\"3 0 PLAY B7\",\"3 1 CHI B6 T7\",\"3 2 CHI T6 W9\"],\"responses\":[\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"CHI B8 B9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY J3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B1\",\"PASS\",\"PASS\",\"P") + string("ASS\",\"PASS\"]}");
+    reader.parse(myin, input_json);
     //==========debug============
+#endif
     //当前回合的下标（即总共回合数量-1）
     turn_id = input_json["responses"].size();
     //读取交互信息，存入request和response
