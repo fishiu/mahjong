@@ -66,6 +66,9 @@ vector<string> sorted_my_card;
 //下面是为了复式赛制增加的解决牌荒问题的变量
 int left_card_num[4] = { 21, 21, 21, 21 }; //34张初始发掉13张剩下21张
 
+//记录是否自摸（用来算番）
+bool is_ZIMO = false;
+
 /**
  * 快速生成牌名，注意是char
  * @param type 'W'
@@ -962,7 +965,8 @@ int getFan(string win_tile) {
         }
         myMapIter++;
     }
-    bool is_ZIMO = (itmp == 2); //是否是自摸
+    //用itmp判断自摸不对
+    //bool is_ZIMO = (itmp == 2); //是否是自摸
     bool is_JUEZHANG = isJueZhang(); //绝张和
     bool is_GANG = 0; //杠上开花
     bool is_LAST = (flower_count + not_flower_count >= 144); //排墙最后一张
@@ -1087,6 +1091,8 @@ string initCondition() {
         str_in >> record_type;
 
         if (record_type == 2) { //我自己摸牌
+            //记录一下自摸信息，itmp不靠谱
+            is_ZIMO = true;
             str_in >> str_tmp;
             all_card[my_player_id].push_back(str_tmp);
             not_flower_count++;
@@ -1117,6 +1123,7 @@ string initCondition() {
 
             //其他玩家的操作信息比如 3 playerID BUHUA Card1
         else if (record_type == 3) {
+            is_ZIMO = false;
 
             int player_id;
             str_in >> player_id;
