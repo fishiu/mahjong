@@ -1437,12 +1437,7 @@ string getBestCard() {
     if (ting != "Fail") {
         return ting;
     }
-    //F,J落单，就直接扔
-    string fj = getSingleFengOrJian();
-    //存在落单的东南西北中发白
-    if (fj != "Fail") {
-        return fj;
-    }
+
 //    //从两头向中间除去间隔两个空位的单牌
 //    string esdouble = eraseDouble();
 //    if (esdouble != "Fail") {
@@ -1457,10 +1452,19 @@ string getBestCard() {
     string si = single();
     if (si != "Fail")
         return si;
+
+    //F,J落单，就直接扔
+    string fj = getSingleFengOrJian();
+    //存在落单的东南西北中发白
+    if (fj != "Fail") {
+        return fj;
+    }
+
     //删除没用的双排（虽然有可能送对方胡）
     string ev = eraseVoid();
     if (ev != "Fail")
         return ev;
+
     //删除双排
     string et = eraseTwo();
     if (et != "Fail")
