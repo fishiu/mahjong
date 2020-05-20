@@ -1110,15 +1110,16 @@ string initCondition() {
                 all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
                 all_card[4].push_back(str_tmp);
             }
-            else if (str_tmp == "GANG") { //GANG T6 就是暗杠
-                str_in >> str_tmp;
-                for (int k = 0; k < 4; k++) {
-                    all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
-                }
-                //这里先注释掉了 因为对于 gang和mypack的处理 统一放在了读request的部分中
-                //gang.push_back(str_tmp);
-                //my_pack.push_back(makePack("GANG", str_temp, my_player_id));
-            }
+            // 杠放在读里面处理
+//            else if (str_tmp == "GANG") { //GANG T6 就是暗杠
+//                str_in >> str_tmp;
+//                for (int k = 0; k < 4; k++) {
+//                    all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
+//                }
+//                //这里先注释掉了 因为对于 gang和mypack的处理 统一放在了读request的部分中
+//                //gang.push_back(str_tmp);
+//                //my_pack.push_back(makePack("GANG", str_temp, my_player_id));
+//            }
         }
 
             //其他玩家的操作信息比如 3 playerID BUHUA Card1
@@ -1644,7 +1645,7 @@ int main() {
 #else
     //==========debug============
     Json::Reader reader;
-    string myin = string("{\"requests\":[\"0 3 3\",\"1 0 0 0 0 B8 T3 W8 T8 T3 W4 F3 W9 W8 T8 F2 B3 B5\",\"3 0 DRAW\",\"3 0 PLAY J2\",\"3 1 DRAW\",\"3 1 PLAY J2\",\"3 2 DRAW\",\"3 2 PLAY B2\",\"2 B9\",\"3 3 PLAY F2\",\"3 0 DRAW\",\"3 0 PLAY J1\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY J1\",\"2 B7\",\"3 3 PLAY F3\",\"3 0 DRAW\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY F1\",\"3 2 DRAW\",\"3 2 PLAY F1\",\"2 T3\",\"3 3 PLAY W4\",\"3 0 DRAW\",\"3 0 PLAY T4\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"3 2 DRAW\",\"3 2 PLAY T9\",\"2 T8\",\"3 3 PLAY B3\",\"3 0 DRAW\",\"3 0 PLAY B5\",\"3 1 CHI B5 B1\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"2 W3\",\"3 3 PLAY W3\",\"3 0 DRAW\",\"3 0 PLAY B8\",\"3 1 DRAW\",\"3 1 PLAY W1\",\"3 2 DRAW\",\"3 2 PLAY B9\",\"3 3 CHI B8 B9\",\"3 0 DRAW\",\"3 0 PLAY T2\",\"3 1 DRAW\",\"3 1 PLAY B1\",\"3 2 DRAW\",\"3 2 PLAY W1\",\"2 J3\",\"3 3 PLAY J3\",\"3 0 DRAW\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY T1\",\"2 W4\",\"3 3 PLAY W4\",\"3 0 DRAW\",\"3 0 PLAY B2\",\"3 1 DRAW\",\"3 1 PLAY J2\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"2 W5\",\"3 3 PLAY W5\",\"3 0 DRAW\",\"3 0 PLAY W1\",\"3 1 DRAW\",\"3 1 PLAY W1\",\"3 2 DRAW\",\"3 2 PLAY T9\",\"2 W9\",\"3 3 PLAY B5\",\"3 0 DRAW\",\"3 0 PLAY W5\",\"3 1 DRAW\",\"3 1 PLAY W2\",\"3 2 DRAW\",\"3 2 PLAY F4\",\"2 W3\",\"3 3 PLAY W3\",\"3 0 DRAW\",\"3 0 PLAY W2\",\"3 1 DRAW\",\"3 1 PLAY F3\",\"3 2 DRAW\",\"3 2 PLAY T1\",\"2 B1\",\"3 3 PLAY B1\",\"3 0 DRAW\",\"3 0 PLAY B7\",\"3 1 CHI B6 T7\",\"3 2 CHI T6 W9\"],\"responses\":[\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"CHI B8 B9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY J3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B1\",\"PASS\",\"PASS\",\"P") + string("ASS\",\"PASS\"]}");
+    string myin = string("{\"requests\":[\"0 2 0\",\"1 0 0 0 0 B5 W2 B8 T3 T3 W4 B6 W3 W2 T1 B3 T5 F1\",\"3 0 DRAW\",\"3 0 PLAY W9\",\"3 1 CHI W8 W9\",\"2 J1\",\"3 2 PLAY F1\",\"3 3 DRAW\",\"3 3 PLAY F1\",\"3 0 DRAW\",\"3 0 PLAY B3\",\"3 1 DRAW\",\"3 1 PLAY B9\",\"3 0 PENG B8\",\"3 1 DRAW\",\"3 1 PLAY T9\",\"2 T3\",\"3 2 PLAY B8\",\"3 3 DRAW\",\"3 3 PLAY F3\",\"3 0 DRAW\",\"3 0 PLAY T8\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"2 B4\",\"3 2 PLAY B3\",\"3 3 DRAW\",\"3 3 PLAY J1\",\"3 0 DRAW\",\"3 0 PLAY F2\",\"3 1 DRAW\",\"3 1 PLAY B5\",\"2 B2\",\"3 2 PLAY J1\",\"3 3 DRAW\",\"3 3 PLAY F2\",\"3 0 DRAW\",\"3 0 PLAY F3\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"2 F3\",\"3 2 PLAY F3\",\"3 3 DRAW\",\"3 3 PLAY W9\",\"3 0 DRAW\",\"3 0 PLAY B1\",\"3 1 DRAW\",\"3 1 PLAY F1\",\"2 T3\",\"3 2 GANG\",\"2 T5\",\"3 2 PLAY B5\",\"3 3 DRAW\",\"3 3 PLAY W4\",\"3 0 DRAW\",\"3 0 PLAY W6\",\"3 1 CHI W6 B1\",\"2 T9\",\"3 2 PLAY T9\",\"3 3 DRAW\",\"3 3 PLAY J2\",\"3 0 DRAW\",\"3 0 PLAY B4\",\"3 1 DRAW\",\"3 1 PLAY B1\",\"2 J1\",\"3 2 PLAY J1\",\"3 3 DRAW\",\"3 3 PLAY T7\",\"3 0 DRAW\",\"3 0 PLAY B3\",\"3 1 DRAW\",\"3 1 PLAY F3\",\"2 W4\",\"3 2 PLAY W3\",\"3 3 DRAW\",\"3 3 PLAY W1\",\"3 0 DRAW\",\"3 0 PLAY J1\",\"3 1 DRAW\",\"3 1 PLAY B5\",\"2 W2\",\"3 2 PLAY B6\",\"3 3 DRAW\",\"3 3 PLAY W7\",\"3 0 DRAW\",\"3 0 PLAY J3\",\"3 1 DRAW\",\"3 1 PLAY B6\",\"2 T8\",\"3 2 PLAY T8\",\"3 3 CHI T8 W1\",\"3 0 DRAW\",\"3 0 PLAY W9\",\"3 1 DRAW\",\"3 1 PLAY F4\",\"3 0 PENG T1\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"2 W2\",\"3 2 GANG\",\"2 W3\"],\"responses\":[\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY J1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"GANG T3\",\"PASS\",\"PLAY B5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY J1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B6\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"") + string(",\"PASS\",\"PASS\",\"GANG W2\",\"PASS\"]}");
     reader.parse(myin, input_json);
     //==========debug============
 #endif
