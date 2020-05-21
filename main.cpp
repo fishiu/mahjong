@@ -1098,6 +1098,7 @@ string initCondition() {
             is_ZIMO = true;
             str_in >> str_tmp;
             all_card[my_player_id].push_back(str_tmp);
+            left_card_num[my_player_id]--;
             not_flower_count++;
             str_in.clear();
             if (i == turn_id) {
@@ -1113,15 +1114,15 @@ string initCondition() {
                 all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
                 all_card[4].push_back(str_tmp);
             }
-            else if (str_tmp == "GANG") { //GANG T6 就是暗杠
-                str_in >> str_tmp;
-                for (int k = 0; k < 4; k++) {
-                    all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
-                }
-                //这里先注释掉了 因为对于 gang和mypack的处理 统一放在了读request的部分中
-                //gang.push_back(str_tmp);
-                //my_pack.push_back(makePack("GANG", str_temp, my_player_id));
-            }
+//            else if (str_tmp == "GANG") { //GANG T6 就是暗杠
+//                str_in >> str_tmp;
+//                for (int k = 0; k < 4; k++) {
+//                    all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), str_tmp));
+//                }
+//                //这里先注释掉了 因为对于 gang和mypack的处理 统一放在了读request的部分中
+//                //gang.push_back(str_tmp);
+//                //my_pack.push_back(makePack("GANG", str_temp, my_player_id));
+//            }
         }
 
             //其他玩家的操作信息比如 3 playerID BUHUA Card1
