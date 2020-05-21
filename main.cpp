@@ -1350,7 +1350,13 @@ string initCondition() {
     }
     return "Fail";
 }
-/**/
+
+/**
+ * 将vector转换为map
+ * @param start
+ * @param end
+ * @return
+ */
 map<string, int> easy_make_map(vector<string>::iterator start, vector<string>::iterator end) {
     map<string, int> tmp_map;
     for (auto it = start; it != end; it++) {
@@ -1791,9 +1797,11 @@ void responseOutTurn() {
         str_out << "PASS";
     }
 }
+
 void doBUGANG() {
     //需要删除peng中的，插入gang中的，并且输出bugang信息
 }
+
 int main() {
     //初始化all_card 0-3是四个玩家，4是桌上的牌
     for (int i = 0; i < 5; i++) {
@@ -1861,4 +1869,149 @@ int main() {
     outputJSON["response"] = response[turn_id];
     cout << outputJSON << endl;
     return 0;
+}
+
+/**
+ * 遍历生成一个该颜色的所有活动牌的vector
+ * @param color
+ * @return
+ */
+vector<string> getColorActiveCards(char color) {
+    vector<string> _v;
+    for (auto itr = my_active_card.begin(); itr != my_active_card.end(); ++itr) {
+        if (itr->second && itr->first[0] == color) {
+            _v.push_back(itr->first);
+        }
+    }
+    return _v;
+}
+
+/**
+ * 在五门齐的策略下，最佳出牌
+ * @return
+ */
+string getBestWuMen() {
+    //先遍历明group
+    vector<pair<string, string>> _groups_inactive; //存放已经鸣牌的组合
+    for (int i = 0; i < my_pack.size(); ++i)
+        _groups_inactive.push_back(make_pair(my_pack[i].first, my_pack[i].second.first));
+    for (int i = 0; i < _groups_inactive.size(); ++i) { //开始遍历明group
+        //针对组合的每一种颜色进行考察
+        char _color = _groups_inactive[i].second[0]; //当前考察的group的颜色
+        string _type = _groups_inactive[i].first; //当前考察的group的种类
+        int _number = _groups_inactive[i].second[1] + '0'; //当前考察的group的种类
+
+        vector<string> _color_cards = getColorActiveCards(_color);
+        int _color_cards_len = _color_cards.size();
+        if (_color_cards_len == 1)
+            return _color_cards[0];
+        else if (_color_cards_len >= 2) {
+            //遍历扔掉不成双的牌
+            for (int j = 0; j < _color_cards_len; ++j) {
+                bool flag_has_pair = false;
+                for (int k = 0; k < _color_cards_len; ++k) {
+                    if (k != j && _color_cards[j] == _color_cards[k]){
+                        flag_has_pair = true;
+                        break;
+                    }
+                }
+                if (!flag_has_pair) {
+                    return _color_cards[j];
+                }
+            }
+        }
+    }
+
+    //再遍历暗group，找是否有顺子或刻子 todo 有个问题，一个花色有不止一个group的情况没考虑（这个可能性比较小，暂时不考虑了）
+    for (auto my_card_itr = my_active_card.begin(); my_card_itr != my_active_card.end(); ++my_card_itr) {
+        string _name = my_card_itr->first;
+        char _color = _name[0];
+        int _n = _name[1] + '0';
+
+        //如果这是一个碰（或杠）
+        if (my_card_itr->second >= 3) {
+            if (_color == 'B' || _color == 'w' || _color == 'W' ) {
+                for (int i = 1; i <= 9; ++i) {
+                    //这张牌数量是单张
+                    string _card = makeCardName(_color, i);
+                    if (my_active_card[_card] == 1 && i != _n) {
+                        return _card;
+                    }
+                }
+            } else if (_color == 'F' || _color == 'J') {
+                for (int i = 1; i <= 4; ++i) {
+                    //这张牌数量是单张
+                    string _card = makeCardName(_color, i);
+                    if (my_active_card[_card] == 1 && i != _n) {
+                        return _card;
+                    }
+                }
+            }
+        }
+        //如果是一个顺子
+        else if (_color != 'F' && _color != 'J' && _n > 1 && _n < 9 && my_active_card[_name] &&
+                   my_active_card[previousCard(_name)] && my_active_card[postCard(_name)]) {
+            for (int i = 1; i <= 9; ++i) {
+                //这张牌数量是单张
+                string _card = makeCardName(_color, i);
+                //下面这个if "或者 ||" 后面表示如果是顺子的一部分但是数量大于1
+                if (my_active_card[_card] == 1 && i != _n ||
+                    abs(i - _n) <= 1 && my_active_card[_card] > 1) {
+                    return _card;
+                }
+            }
+        }
+    }
+
+    //如果还没有选出，那么扔数量多的花色
+    string color_list = "BTWFJ";
+    char target_color = 'B';
+    int color_cnt_max = 0;
+    for (int i = 0; i < 5; ++i) {
+        int color_cnt = getColorActiveCards(color_list[i]).size();
+        if (color_cnt > color_cnt_max) {
+            color_cnt_max = color_cnt;
+            target_color = color_list[i];
+        }
+    }
+    vector<string> color_cards_vector = getColorActiveCards(target_color);
+    //todo 下面这部分算得很冗余，需要优化
+    getRestCard(); //todo 我觉得这个应该有重复调用了
+    map<string, int> color_cards = easy_make_map(color_cards_vector.begin(), color_cards_vector.end());
+    map<string, int> color_cards_score;
+    for (auto color_cards_itr = color_cards.begin(); color_cards_itr != color_cards.end(); ++color_cards_itr) {
+        string _name = color_cards_itr->first;
+        int score_dist = 0;
+        for (auto itr = color_cards.begin(); itr != color_cards.end(); ++itr) {
+            if (itr != color_cards_itr) {
+                score_dist += abs(itr->first[1] - color_cards_itr->first[1]);
+            }
+        }
+        color_cards_score[_name] = score_dist/color_cards.size() - rest_card[_name] - color_cards_itr->second*2;
+        if (color_cards[previousCard(_name)] || color_cards[postCard(_name)])
+            color_cards_score[_name] -= 2;
+    }
+    int max_score = -1000;
+    string best_card;
+    for (auto itr = color_cards_score.begin(); itr != color_cards_score.end(); ++itr) {
+        if (itr->second > max_score) {
+            max_score = itr->second;
+            best_card = itr->first;
+        }
+    }
+    return best_card;
+}
+
+/**
+ * 五门齐策略下是否允许此颜色的吃碰杠
+ * @param color 'W' 注意是char
+ * @return 可以鸣牌 true，否则 false
+ */
+bool checkColorWuMen(char color) {
+    for (int i = 0; i < my_pack.size(); ++i) {
+        if (my_pack[i].second.first[0] == color) {
+            return false;
+        }
+    }
+    return true;
 }
