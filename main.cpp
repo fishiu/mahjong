@@ -64,7 +64,7 @@ unordered_map<string, int>all_rest_card;
 vector<string> sorted_my_card;
 
 //下面是为了复式赛制增加的解决牌荒问题的变量
-int left_card_num[4] = {21, 21, 21, 21}; //34张初始发掉13张剩下21张
+int left_card_num[4] = { 21, 21, 21, 21 }; //34张初始发掉13张剩下21张
 
 //记录是否自摸（用来算番）
 bool is_ZIMO = false;
@@ -348,6 +348,8 @@ string eraseSingle() {
     return "Fail";
 }
 
+
+
 int getFan(string);
 
 /**
@@ -356,7 +358,7 @@ int getFan(string);
  * @param gotCard 自己摸到的牌
  * @return 番数
  */
-int checkHu(vector<string> Cards,string gotCard) {
+int checkHu(vector<string> Cards, string gotCard) {
     return getFan(gotCard);
     setMyCard(my_player_id);
     unordered_map<string, int> newmap = my_active_card;
@@ -647,11 +649,12 @@ int checkHu(vector<string> Cards,string gotCard) {
 */
 string checkTing() {
     auto it = my_active_card.begin();
-    unordered_map<string, int> hu_possibility;
+    unordered_map<string, int> hu_possibility,second_possibility;
     //遍历所有的key
     for (; it != my_active_card.end(); it++) {
         //如果有超过一张
         if (it->second > 0) {
+            //删牌
             string value = it->first;
             all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), value));
             //可能胡牌的个数
@@ -672,6 +675,8 @@ string checkTing() {
     }
     //找出sum最大的值
     if (hu_possibility.size() == 0) {
+        //看看能不能换两张牌以后听牌
+
         return "Fail";
     }
     else {
@@ -690,7 +695,46 @@ string checkTing() {
  * 从两头向中间除去单牌 W,B,T
  * @return 相应的牌名 如果找不到返回 Fail
  */
+//可以考虑加上出手里最少的牌型
+//可以考虑加上出手里最少的牌型
 string single() {
+    setMyCard(my_player_id);
+    for (int remain = 3; remain >= 0; remain--) {
+        for (int i = 1; i <= 4; i++) {
+            if (my_active_card[makeCardName('F', i)] == 1 && getCardNumAll(makeCardName('F', i)) == remain) {
+                return makeCardName('F', i);
+            }
+        }
+        for (int i = 1; i <= 3; i++) {
+            if (my_active_card[makeCardName('J', i)] == 1 && getCardNumAll(makeCardName('J', i)) == remain) {
+                return makeCardName('J', i);
+            }
+        }
+        int i = 1, j = 9;
+        for (; i <= j; i++, j--) {
+            if (my_active_card[makeCardName('W', i)] == 1 && getCardNumAll(makeCardName('W', i)) == remain) {
+                return makeCardName('W', i);
+            }
+            if (j != i && my_active_card[makeCardName('W', j)] == 1 && getCardNumAll(makeCardName('W', j)) == remain) {
+                return makeCardName('W', j);
+            }
+            if (my_active_card[makeCardName('B', i)] == 1 && getCardNumAll(makeCardName('B', i)) == remain) {
+                return makeCardName('B', i);
+            }
+            if (j != i && my_active_card[makeCardName('B', j)] == 1 && getCardNumAll(makeCardName('B', j)) == remain) {
+                return makeCardName('B', j);
+            }
+            if (my_active_card[makeCardName('T', i)] == 1 && getCardNumAll(makeCardName('T', i)) == remain) {
+                return makeCardName('T', i);
+            }
+            if (j != i && my_active_card[makeCardName('T', j)] == 1 && getCardNumAll(makeCardName('T', j)) == remain) {
+                return makeCardName('T', j);
+            }
+        }
+    }
+
+    return "Fail";
+    /*
     int i = 1, j = 9;
     for (; i <= j; i++, j--) {
         if (my_active_card[makeCardName('W', i)] == 1) {
@@ -699,8 +743,20 @@ string single() {
         if (j != i && my_active_card[makeCardName('W', j)] == 1) {
             return makeCardName('W', j);
         }
-    }
-    return "Fail";
+        if (my_active_card[makeCardName('B', i)] == 1) {
+            return makeCardName('B', i);
+        }
+        if (j != i && my_active_card[makeCardName('B', j)] == 1) {
+            return makeCardName('B', j);
+        }
+        if (my_active_card[makeCardName('T', i)] == 1) {
+            return makeCardName('T', i);
+        }
+        if (j != i && my_active_card[makeCardName('T', j)] == 1) {
+            return makeCardName('T', j);
+        }
+    }*/
+    //return "Fail";
 }
 
 
@@ -713,7 +769,7 @@ string checkChi(string newCard) {
     //return "Fail";
     if (newCard[0] == 'F' || newCard[0] == 'J')
         return "Fail";
-    int flag_1=0, flag_2=0, flag0=0, flag1=0, flag2 = 0;
+    int flag_1 = 0, flag_2 = 0, flag0 = 0, flag1 = 0, flag2 = 0;
     if (my_active_card[previousCard(previousCard(newCard))]) {
         flag_2 = my_active_card[previousCard(previousCard(newCard))];
     }
@@ -830,7 +886,7 @@ bool checkPeng(string newCard) {
     if (my_active_card.find(newCard) == my_active_card.end()) {
         return false;
     }
-    else if (my_active_card[newCard] ==  2) {
+    else if (my_active_card[newCard] == 2) {
         return true;
     }
     return false;
@@ -922,7 +978,7 @@ int getFan(string win_tile) {
 
     // 算番函数
     MahjongInit();
-    try{
+    try {
         vector<pair<int, string> > res = MahjongFanCalculator(
                 pack,
                 fan_hand,
@@ -941,7 +997,8 @@ int getFan(string win_tile) {
             sum += res[i].first;
         }
         return sum;
-    }catch(const string &error){
+    }
+    catch (const string &error) {
         return 0;
     }
 }
@@ -1280,7 +1337,8 @@ string initCondition() {
                     if (i == turn_id)
                         return str_tmp;
                 }
-            } else if (str_tmp == "DRAW") {
+            }
+            else if (str_tmp == "DRAW") {
                 //处理摸牌情况，记录排山的减少
                 left_card_num[player_id]--;
             }
@@ -1312,13 +1370,96 @@ bool adjacent_card(string card1, string card2) {
     return false;
 }
 
+//去除无效的排，即不可能拿到的双排
+string eraseVoid() {
+    setMyCard(my_player_id);
+    for (int i = 1; i <= 4; i++) {
+        if (my_active_card[makeCardName('F', i)] == 2 && my_active_card[makeCardName('F', i)] + getCardNumAll(makeCardName('F', i)) == 4) {
+            return makeCardName('F', i);
+        }
+    }
+    for (int i = 1; i <= 3; i++) {
+        if (my_active_card[makeCardName('J', i)] == 2 && my_active_card[makeCardName('J', i)] + getCardNumAll(makeCardName('J', i)) == 4) {
+            return makeCardName('J', i);
+        }
+    }
+    int i = 1, j = 9;
+    for (; i <= j; i++, j--) {
+        if (my_active_card[makeCardName('W', i)] == 2 && my_active_card[makeCardName('W', i)] + getCardNumAll(makeCardName('W', i)) == 4) {
+            return makeCardName('W', i);
+        }
+        if (j != i && my_active_card[makeCardName('W', j)] == 2 && my_active_card[makeCardName('W', j)] + getCardNumAll(makeCardName('W', j)) == 4) {
+            return makeCardName('W', j);
+        }
+        if (my_active_card[makeCardName('B', i)] == 2 && my_active_card[makeCardName('B', i)] + getCardNumAll(makeCardName('B', i)) == 4) {
+            return makeCardName('B', i);
+        }
+        if (j != i && my_active_card[makeCardName('B', j)] == 2 && my_active_card[makeCardName('B', j)] + getCardNumAll(makeCardName('B', j)) == 4) {
+            return makeCardName('B', j);
+        }
+        if (my_active_card[makeCardName('T', i)] == 2 && my_active_card[makeCardName('T', i)] + getCardNumAll(makeCardName('T', i)) == 4) {
+            return makeCardName('T', i);
+        }
+        if (j != i && my_active_card[makeCardName('T', j)] == 2 && my_active_card[makeCardName('T', j)] + getCardNumAll(makeCardName('T', j)) == 4) {
+            return makeCardName('T', j);
+        }
+    }
 
+    return "Fail";
+}
+
+//删除两张的牌
+string eraseTwo() {
+    vector<string> v;
+    for (int i = 1; i <= 9; i++) {
+        if (my_active_card[makeCardName('W', i)] > 0 && my_active_card[makeCardName('W', i)] < 3) {
+            v.push_back(makeCardName('W', i));
+        }
+        if (my_active_card[makeCardName('B', i)] > 0 && my_active_card[makeCardName('B', i)] < 3) {
+            v.push_back(makeCardName('B', i));
+        }
+        if (my_active_card[makeCardName('T', i)] > 0 && my_active_card[makeCardName('T', i)] < 3) {
+            v.push_back(makeCardName('T', i));
+        }
+    }
+    if (v.size() == 0)
+        return "Fail";
+    random_shuffle(v.begin(), v.end());
+    return v[0];
+}
+
+//选择策略,true选择ppp，否则qqr
+bool chooseStrategy() {
+    //在这之前应该setMyCard完成了
+    //吃不是空时
+    if (turn_id <= 10)
+        return true;
+    if (!chi.empty()) {
+        return false;
+    }
+    if (!gang.empty()) {
+        return true;
+    }
+    //setMyCard();
+    int score = 0;
+    int total = 0;
+    for (auto it = my_active_card.begin(); it != my_active_card.end(); it++) {
+        total += it->second;
+        if (it->second > 1) {
+            score += it->second - 1;
+        }
+    }
+    if (score >= 3 * total / 14)
+        return true;
+    return false;
+}
 
 /**
  * 挑选一张最适合出牌的牌
  * @return 最优的牌
  */
-string getBestCard() {
+//true意味着吃完  para = 1则ppp，para = 2 qqr
+string getBestCard(int para = 0) {
     setMyCard(my_player_id);
     //如果可以听牌还没写，写在这儿
     string ting = checkTing();
@@ -1331,142 +1472,184 @@ string getBestCard() {
     if (fj != "Fail") {
         return fj;
     }
-    //从两头向中间除去间隔两个空位的单牌
-    string esdouble = eraseDouble();
-    if (esdouble != "Fail") {
-        return esdouble;
-    }
-    //从两头向中间除去间隔一个空位的单牌
-    string es = eraseSingle();
-    if (es != "Fail") {
-        return es;
-    }
-    //接下来需要形成新的数据结构，去除连续牌数为4、7、10、13中的一张牌，让牌型成为无将胡牌型。如2344条，去除4条。
-    //先对我的手牌排序
-    sort(all_card[my_player_id].begin(), all_card[my_player_id].end());
-    vector<string> delete_card;
-    //先把手牌中的3张的牌排除,再去除所有的顺子
-    int len = all_card[my_player_id].size();
-    for (int i = 2; i < len; i++) {
-        //如果不是连续的牌
-        if (all_card[my_player_id][i - 2] == all_card[my_player_id][i - 1] && all_card[my_player_id][i - 1] == all_card[my_player_id][i]) {
-            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i - 2]));
-            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i - 1]));
-            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i]));
-            len = all_card[my_player_id].size();
-        }
-    }
-    len = all_card[my_player_id].size();
-    for (int i = 2; i < len; i++) {
-        //如果不是顺子
-        if (adjacent_card(all_card[my_player_id][i - 2], all_card[my_player_id][i - 1]) && adjacent_card(all_card[my_player_id][i - 1], all_card[my_player_id][i]) && !(i - 3 > 0 && all_card[my_player_id][i - 2] == all_card[my_player_id][i - 3]
-                                                                                                                                                                        && i + 1 < len && all_card[my_player_id][i + 1] == all_card[my_player_id][i])) {
-            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i - 2]));
-            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i - 1]));
-            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i]));
-            //delete_card.push_back(all_card[my_player_id][i - 2]);
-            //delete_card.push_back(all_card[my_player_id][i - 1]);
-            //delete_card.push_back(all_card[my_player_id][i]);
-            len = all_card[my_player_id].size();
-        }
-    }
-    len = all_card[my_player_id].size();
-    //再去掉222
-    for (int i = 5; i < len; i++) {
-        if (all_card[my_player_id][i - 5] == all_card[my_player_id][i - 4] && adjacent_card(all_card[my_player_id][i - 4], all_card[my_player_id][i - 3])
-            && all_card[my_player_id][i - 3] == all_card[my_player_id][i - 2] && adjacent_card(all_card[my_player_id][i - 2], all_card[my_player_id][i - 1]) &&
-            all_card[my_player_id][i - 1] == all_card[my_player_id][i]) {
-            delete_card.push_back(all_card[my_player_id][i - 5]);
-            delete_card.push_back(all_card[my_player_id][i - 4]);
-            delete_card.push_back(all_card[my_player_id][i - 3]);
-            delete_card.push_back(all_card[my_player_id][i - 2]);
-            delete_card.push_back(all_card[my_player_id][i - 1]);
-            delete_card.push_back(all_card[my_player_id][i]);
-            len = all_card[my_player_id].size();
-        }
-    }
-    for (int i = 0; i < delete_card.size(); i++) {
-        all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), delete_card[i]));
-    }
-    //然后再考虑一遍落单的单牌
-    //从两头向中间除去间隔两个空位的单牌
-    esdouble = eraseDouble();
-    if (esdouble != "Fail") {
-        return esdouble;
-    }
-    //从两头向中间除去间隔一个空位的单牌
-    es = eraseSingle();
-    if (es != "Fail") {
-        return es;
-    }
-
-    //两个数据结构，第一个是分别是连续几个连在一起，第二个是到哪个index。比如第一个是1，3，4...，第二个就是1,4,8...
-    //每个index是区间的开始
-    vector<int> continue_sum_index;
-    continue_sum_index.push_back(0);
-    //更新长度
-    len = all_card[my_player_id].size();
-    for (int i = 1; i < len; i++) {
-        //如果不是连续的牌
-        if (!((all_card[my_player_id][i - 1][0] == all_card[my_player_id][i][0]) && ((all_card[my_player_id][i][1] - all_card[my_player_id][i - 1][1] == 0) || (all_card[my_player_id][i][1] - all_card[my_player_id][i - 1][1] == 1)))) {
-            continue_sum_index.push_back(i);
-        }
-    }
-    continue_sum_index.push_back(len);
-    int len_index = continue_sum_index.size();
-    //等于1因为是求差分所以少一个
-    for (int i = 1; i < len; i++) {
-        int interval = continue_sum_index[i] - continue_sum_index[i - 1];
-        //去除连续牌数为4、7、10、13中的一张牌，让牌型成为无将胡牌型。如2344条，去除4条。
-        //四条可能是1111，211，22，22就不处理
-        if (interval == 4) {
-            //map<string, int> tmp_map = easy_make_map(&(all_card[my_player_id][continue_sum_index[i - 1]]), &(all_card[my_player_id][continue_sum_index[i]]));
-            map<string, int> tmp_map;
-            for (int j = continue_sum_index[i - 1]; j != continue_sum_index[i]; j++) {
-                if (tmp_map.find(all_card[my_player_id][j]) == tmp_map.end()) {
-                    tmp_map[all_card[my_player_id][j]] = 1;
-                }
-                else {
-                    tmp_map[all_card[my_player_id][j]] += 1;
-                }
-            }
-            if (tmp_map.size() == 4) {
-                return all_card[my_player_id][continue_sum_index[i - 1]];
-            }
-            else if (tmp_map.size() == 3) {
-                for (auto it1 = tmp_map.begin(); it1 != tmp_map.end(); it1++) {
-                    if (it1->second == 2) {
-                        return it1->first;
-                    }
-                }
-            }
-            //22的情况不处理了
-        }
-        //if (interval == 7) {
-        //7只处理2212的情况，前面处理过了
+    bool strategy = chooseStrategy();
+    setMyCard(my_player_id);
+    if (strategy) {
+        //从两头向中间除去间隔两个空位的单牌
+        //string esdouble = eraseDouble();
+        //if (esdouble != "Fail") {
+        //	return esdouble;
         //}
-    }
+        //    //从两头向中间除去间隔一个空位的单牌
+        //    string es = eraseSingle();
+        //    if (es != "Fail") {
+        //        return es;
+        //    }
+        //删除单排
 
-    //string sing = single();
-    //if (sing != "Fail") {
-    //	return sing;
-    //}
-
-    //什么都没有return的时候
-    random_shuffle(all_card[my_player_id].begin(), all_card[my_player_id].end());
-    auto it_return = all_card[my_player_id].begin();
-    while (it_return != all_card[my_player_id].end()) {
-        if ((*it_return)[0] != 'F' && (*it_return)[0] != 'J') {
-            break;
+        string si = single();
+        if (si != "Fail")
+            return si;
+        //删除没用的双排（虽然有可能送对方胡）
+        string ev = eraseVoid();
+        if (ev != "Fail")
+            return ev;
+        //删除双排
+        string et = eraseTwo();
+        if (et != "Fail")
+            return et;
+        //其他情况应该没有了，如果有就random吧
+        //什么都没有return的时候
+        random_shuffle(all_card[my_player_id].begin(), all_card[my_player_id].end());
+        auto it_return = all_card[my_player_id].begin();
+        while (it_return != all_card[my_player_id].end()) {
+            if ((*it_return)[0] != 'F' && (*it_return)[0] != 'J') {
+                break;
+            }
+            it_return++;
         }
-        it_return++;
-    }
-    if (it_return != all_card[my_player_id].end()) {
-        return *it_return;
+        if (it_return != all_card[my_player_id].end()) {
+            return *it_return;
+        }
+        else {
+            return *(all_card[my_player_id].rbegin());
+        }
     }
     else {
-        return *(all_card[my_player_id].rbegin());
+        //从两头向中间除去间隔两个空位的单牌
+        string esdouble = eraseDouble();
+        if (esdouble != "Fail") {
+            return esdouble;
+        }
+        //从两头向中间除去间隔一个空位的单牌
+        string es = eraseSingle();
+        if (es != "Fail") {
+            return es;
+        }
+        //接下来需要形成新的数据结构，去除连续牌数为4、7、10、13中的一张牌，让牌型成为无将胡牌型。如2344条，去除4条。
+        //先对我的手牌排序
+        sort(all_card[my_player_id].begin(), all_card[my_player_id].end());
+        vector<string> delete_card;
+        //先把手牌中的3张的牌排除,再去除所有的顺子
+        int len = all_card[my_player_id].size();
+        for (int i = 2; i < len; i++) {
+            //如果不是连续的牌
+            if (all_card[my_player_id][i - 2] == all_card[my_player_id][i - 1] && all_card[my_player_id][i - 1] == all_card[my_player_id][i]) {
+                all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i - 2]));
+                all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i - 1]));
+                all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i]));
+                len = all_card[my_player_id].size();
+            }
+        }
+        len = all_card[my_player_id].size();
+        for (int i = 2; i < len; i++) {
+            //如果不是顺子
+            if (adjacent_card(all_card[my_player_id][i - 2], all_card[my_player_id][i - 1]) && adjacent_card(all_card[my_player_id][i - 1], all_card[my_player_id][i]) && !(i - 3 > 0 && all_card[my_player_id][i - 2] == all_card[my_player_id][i - 3]
+                                                                                                                                                                            && i + 1 < len && all_card[my_player_id][i + 1] == all_card[my_player_id][i])) {
+                all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i - 2]));
+                all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i - 1]));
+                all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), all_card[my_player_id][i]));
+                //delete_card.push_back(all_card[my_player_id][i - 2]);
+                //delete_card.push_back(all_card[my_player_id][i - 1]);
+                //delete_card.push_back(all_card[my_player_id][i]);
+                len = all_card[my_player_id].size();
+            }
+        }
+        len = all_card[my_player_id].size();
+        //再去掉222
+        for (int i = 5; i < len; i++) {
+            if (all_card[my_player_id][i - 5] == all_card[my_player_id][i - 4] && adjacent_card(all_card[my_player_id][i - 4], all_card[my_player_id][i - 3])
+                && all_card[my_player_id][i - 3] == all_card[my_player_id][i - 2] && adjacent_card(all_card[my_player_id][i - 2], all_card[my_player_id][i - 1]) &&
+                all_card[my_player_id][i - 1] == all_card[my_player_id][i]) {
+                delete_card.push_back(all_card[my_player_id][i - 5]);
+                delete_card.push_back(all_card[my_player_id][i - 4]);
+                delete_card.push_back(all_card[my_player_id][i - 3]);
+                delete_card.push_back(all_card[my_player_id][i - 2]);
+                delete_card.push_back(all_card[my_player_id][i - 1]);
+                delete_card.push_back(all_card[my_player_id][i]);
+                len = all_card[my_player_id].size();
+            }
+        }
+        for (int i = 0; i < delete_card.size(); i++) {
+            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), delete_card[i]));
+        }
+        //然后再考虑一遍落单的单牌
+        //从两头向中间除去间隔两个空位的单牌
+        esdouble = eraseDouble();
+        if (esdouble != "Fail") {
+            return esdouble;
+        }
+        //从两头向中间除去间隔一个空位的单牌
+        es = eraseSingle();
+        if (es != "Fail") {
+            return es;
+        }
+
+        //两个数据结构，第一个是分别是连续几个连在一起，第二个是到哪个index。比如第一个是1，3，4...，第二个就是1,4,8...
+        //每个index是区间的开始
+        vector<int> continue_sum_index;
+        continue_sum_index.push_back(0);
+        //更新长度
+        len = all_card[my_player_id].size();
+        for (int i = 1; i < len; i++) {
+            //如果不是连续的牌
+            if (!((all_card[my_player_id][i - 1][0] == all_card[my_player_id][i][0]) && ((all_card[my_player_id][i][1] - all_card[my_player_id][i - 1][1] == 0) || (all_card[my_player_id][i][1] - all_card[my_player_id][i - 1][1] == 1)))) {
+                continue_sum_index.push_back(i);
+            }
+        }
+        continue_sum_index.push_back(len);
+        int len_index = continue_sum_index.size();
+        //等于1因为是求差分所以少一个
+        for (int i = 1; i < len; i++) {
+            int interval = continue_sum_index[i] - continue_sum_index[i - 1];
+            //去除连续牌数为4、7、10、13中的一张牌，让牌型成为无将胡牌型。如2344条，去除4条。
+            //四条可能是1111，211，22，22就不处理
+            if (interval == 4) {
+                //map<string, int> tmp_map = easy_make_map(&(all_card[my_player_id][continue_sum_index[i - 1]]), &(all_card[my_player_id][continue_sum_index[i]]));
+                map<string, int> tmp_map;
+                for (int j = continue_sum_index[i - 1]; j != continue_sum_index[i]; j++) {
+                    if (tmp_map.find(all_card[my_player_id][j]) == tmp_map.end()) {
+                        tmp_map[all_card[my_player_id][j]] = 1;
+                    }
+                    else {
+                        tmp_map[all_card[my_player_id][j]] += 1;
+                    }
+                }
+                if (tmp_map.size() == 4) {
+                    return all_card[my_player_id][continue_sum_index[i - 1]];
+                }
+                else if (tmp_map.size() == 3) {
+                    for (auto it1 = tmp_map.begin(); it1 != tmp_map.end(); it1++) {
+                        if (it1->second == 2) {
+                            return it1->first;
+                        }
+                    }
+                }
+                //22的情况不处理了
+            }
+            //if (interval == 7) {
+            //7只处理2212的情况，前面处理过了
+            //}
+        }
+        //什么都没有return的时候
+        random_shuffle(all_card[my_player_id].begin(), all_card[my_player_id].end());
+        auto it_return = all_card[my_player_id].begin();
+        while (it_return != all_card[my_player_id].end()) {
+            if ((*it_return)[0] != 'F' && (*it_return)[0] != 'J') {
+                break;
+            }
+            it_return++;
+        }
+        if (it_return != all_card[my_player_id].end()) {
+            return *it_return;
+        }
+        else {
+            return *(all_card[my_player_id].rbegin());
+        }
     }
+//
+
+    //以下是原来的，全部不要了，直接去除单排就好
 }
 
 /**
@@ -1547,7 +1730,8 @@ void responseOutTurn() {
         //如果可以抢牌胡
         if (checkHu(all_card[my_player_id], stmp) && getFan(stmp) >= 8) {
             str_out << "HU";
-        } else if (checkHu(all_card[my_player_id], stmp)) {
+        }
+        else if (checkHu(all_card[my_player_id], stmp)) {
             str_out << "PASS";
         }
         else if (left_card_num[(itmp + 1) % 4] == 0) {
@@ -1577,19 +1761,26 @@ void responseOutTurn() {
             stmp = getBestCard();
             str_out << stmp;
         }
-        else if (itmp == (my_player_id + 3) % 4 &&  checkChi(stmp) != "Fail") {
+        else if (itmp == (my_player_id + 3) % 4 && checkChi(stmp) != "Fail") {
             //stmp存了吃的牌的中间的牌
             string value = stmp;
 
             stmp = checkChi(stmp);
             all_card[my_player_id].push_back(value);//先存进来之后三个一起erase
-            //三个erase
-            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), previousCard(stmp)));
-            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
-            all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), postCard(stmp)));
-            str_out << "CHI " << stmp << " ";
-            stmp = getBestCard();
-            str_out << stmp;
+            //这里新加
+            //如果能听牌就吃
+            setMyCard(my_player_id);
+            if (checkTing() != "Fail" || !chooseStrategy()) {
+                //三个erase
+                all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), previousCard(stmp)));
+                all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
+                all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), postCard(stmp)));
+                str_out << "CHI " << stmp << " ";
+                stmp = getBestCard();
+                str_out << stmp;
+            }
+            else
+                str_out << "PASS";
         }
         else {
             str_out << "PASS";
@@ -1612,16 +1803,15 @@ int main() {
     //
     //Json交互的输入（删掉了普通交互）
     Json::Value input_json;
-    #ifdef _BOTZONE_ONLINE
+#ifdef _BOTZONE_ONLINE
     cin >> input_json;
-    #else
+#else
     //==========debug============
     Json::Reader reader;
-    string myin = string("{\"requests\":[\"0 3 3\",\"1 0 0 0 0 B8 T3 W8 T8 T3 W4 F3 W9 W8 T8 F2 B3 B5\",\"3 0 DRAW\",\"3 0 PLAY J2\",\"3 1 DRAW\",\"3 1 PLAY J2\",\"3 2 DRAW\",\"3 2 PLAY B2\",\"2 B9\",\"3 3 PLAY F2\",\"3 0 DRAW\",\"3 0 PLAY J1\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY J1\",\"2 B7\",\"3 3 PLAY F3\",\"3 0 DRAW\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY F1\",\"3 2 DRAW\",\"3 2 PLAY F1\",\"2 T3\",\"3 3 PLAY W4\",\"3 0 DRAW\",\"3 0 PLAY T4\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"3 2 DRAW\",\"3 2 PLAY T9\",\"2 T8\",\"3 3 PLAY B3\",\"3 0 DRAW\",\"3 0 PLAY B5\",\"3 1 CHI B5 B1\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"2 W3\",\"3 3 PLAY W3\",\"3 0 DRAW\",\"3 0 PLAY B8\",\"3 1 DRAW\",\"3 1 PLAY W1\",\"3 2 DRAW\",\"3 2 PLAY B9\",\"3 3 CHI B8 B9\",\"3 0 DRAW\",\"3 0 PLAY T2\",\"3 1 DRAW\",\"3 1 PLAY B1\",\"3 2 DRAW\",\"3 2 PLAY W1\",\"2 J3\",\"3 3 PLAY J3\",\"3 0 DRAW\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY T1\",\"2 W4\",\"3 3 PLAY W4\",\"3 0 DRAW\",\"3 0 PLAY B2\",\"3 1 DRAW\",\"3 1 PLAY J2\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"2 W5\",\"3 3 PLAY W5\",\"3 0 DRAW\",\"3 0 PLAY W1\",\"3 1 DRAW\",\"3 1 PLAY W1\",\"3 2 DRAW\",\"3 2 PLAY T9\",\"2 W9\",\"3 3 PLAY B5\",\"3 0 DRAW\",\"3 0 PLAY W5\",\"3 1 DRAW\",\"3 1 PLAY W2\",\"3 2 DRAW\",\"3 2 PLAY F4\",\"2 W3\",\"3 3 PLAY W3\",\"3 0 DRAW\",\"3 0 PLAY W2\",\"3 1 DRAW\",\"3 1 PLAY F3\",\"3 2 DRAW\",\"3 2 PLAY T1\",\"2 B1\",\"3 3 PLAY B1\",\"3 0 DRAW\",\"3 0 PLAY B7\",\"3 1 CHI B6 T7\",\"3 2 CHI T6 W9\"],\"responses\":[\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"CHI B8 B9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY J3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B1\",\"PASS\",\"PASS\",\"P") + string("ASS\",\"PASS\"]}");
+    string myin = string("{\"requests\":[\"0 0 2\",\"1 0 0 0 0 B7 B4 T9 T2 T1 W4 B5 F1 W7 W1 F4 F4 B8\",\"2 W3\",\"3 0 PLAY F1\",\"3 3 PENG F3\",\"2 B6\",\"3 0 PLAY W1\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY F1\",\"3 3 DRAW\",\"3 3 PLAY J3\",\"2 B1\",\"3 0 PLAY B1\",\"3 1 DRAW\",\"3 1 PLAY F3\",\"3 2 DRAW\",\"3 2 PLAY W1\",\"3 3 DRAW\",\"3 3 PLAY B1\",\"2 B9\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY J1\",\"3 2 PENG B1\",\"3 3 DRAW\",\"3 3 PLAY W9\",\"2 W9\",\"3 0 PLAY W9\",\"3 1 DRAW\",\"3 1 PLAY J2\",\"3 2 DRAW\",\"3 2 PLAY B8\",\"3 3 DRAW\",\"3 3 PLAY B4\",\"3 1 PENG T1\",\"3 2 DRAW\",\"3 2 PLAY T2\",\"3 3 DRAW\",\"3 3 PLAY T5\",\"2 J2\",\"3 0 PLAY J2\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"3 3 DRAW\",\"3 3 PLAY B3\",\"3 0 CHI B4 W7\",\"3 1 DRAW\",\"3 1 PLAY W6\",\"3 2 DRAW\",\"3 2 PLAY F2\",\"3 3 DRAW\",\"3 3 PLAY T1\",\"2 W1\",\"3 0 PLAY W1\",\"3 1 DRAW\",\"3 1 PLAY T2\",\"3 2 DRAW\",\"3 2 PLAY W9\",\"3 3 DRAW\",\"3 3 PLAY T2\",\"2 W7\",\"3 0 PLAY W7\",\"3 1 DRAW\",\"3 1 PLAY W2\",\"3 2 DRAW\",\"3 2 PLAY J3\",\"3 3 DRAW\",\"3 3 PLAY T9\",\"2 T6\",\"3 0 PLAY T6\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY T6\",\"3 3 DRAW\",\"3 3 PLAY T6\",\"2 B2\",\"3 0 PLAY B2\",\"3 1 DRAW\",\"3 1 PLAY W7\",\"3 2 DRAW\",\"3 2 PLAY B5\",\"3 3 DRAW\",\"3 3 PLAY B2\",\"2 W3\",\"3 0 PLAY W3\",\"3 1 DRAW\",\"3 1 PLAY W2\",\"3 2 DRAW\",\"3 2 PLAY T5\",\"3 3 DRAW\",\"3 3 PLAY W2\"],\"responses\":[\"PASS\",\"PASS\",\"PLAY F1\",\"PASS\",\"PASS\",\"PLAY W1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"CHI B5 W7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY J2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"CHI B4 W7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T6\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
     reader.parse(myin, input_json);
     //==========debug============
-    #endif
-
+#endif
     //当前回合的下标（即总共回合数量-1）
     turn_id = input_json["responses"].size();
     //读取交互信息，存入request和response
