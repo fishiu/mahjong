@@ -1522,6 +1522,17 @@ bool ifhunyise( int tongse_num, int zipai_num) {
 			counter += it->second;
 		}
 	}
+
+	for (auto it = peng.begin(); it != peng.end(); it++) {
+		if ((*it)[0] == huase) counter += 3;
+	}
+	for (auto it = chi.begin(); it != chi.end(); it++) {
+		if ((*it)[0] == huase) counter += 3;
+	}
+	for (auto it = gang.begin(); it != gang.end(); it++) {
+		if ((*it)[0] == huase) counter += 3;
+	}
+
 	if (counter >= tongse_num) return true;
 	return false;
 }
