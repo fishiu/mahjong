@@ -2015,3 +2015,52 @@ bool checkColorWuMen(char color) {
     }
     return true;
 }
+
+/**
+ * 判断此情况下是否选择五门齐
+ * @return 选择true 否则false
+ */
+bool chooseWuMen() {
+    int JF_cnt = 0;
+    bool flag_color = false;
+    vector<string> group_color_cnt;
+    for (int i = 0; i < my_pack.size(); ++i) {
+        char c = my_pack[i].second.first[0];
+        group_color_cnt.push_back(string(&c));
+    }
+    map<string,int> res = easy_make_map(group_color_cnt.begin(), group_color_cnt.end());
+    for (auto itr = res.begin(); itr != res.end(); ++itr) {
+        if (itr->second > 1) {
+            return false;
+        }
+    }
+    for (auto itr = my_active_card.begin(); itr != my_active_card.end(); ++itr) {
+        char color = itr->first[0];
+        if (color == 'F' || color == 'J') {
+            if (itr->second >= 2)
+                JF_cnt = 2;
+        }
+    }
+    int f_cnt = 0;
+    int j_cnt = 0;
+    int t_cnt = 0;
+    int w_cnt = 0;
+    int b_cnt = 0;
+    for (int j = 0; j < all_card[my_player_id].size(); ++j) {
+        switch (all_card[my_player_id][j][0]) {
+            case 'F':
+                f_cnt++;break;
+            case 'J':
+                j_cnt++;break;
+            case 'T':
+                t_cnt++;break;
+            case 'B':
+                b_cnt++;break;
+            case 'W':
+                w_cnt++;break;
+        }
+    }
+    if (f_cnt > 2 && j_cnt > 2 && t_cnt > 2 && w_cnt > 2 && b_cnt > 2)
+        flag_color = true;
+    return JF_cnt == 2 && flag_color;
+}
