@@ -649,11 +649,12 @@ int checkHu(vector<string> Cards, string gotCard) {
 */
 string checkTing() {
     auto it = my_active_card.begin();
-    unordered_map<string, int> hu_possibility;
+    unordered_map<string, int> hu_possibility,second_possibility;
     //遍历所有的key
     for (; it != my_active_card.end(); it++) {
         //如果有超过一张
         if (it->second > 0) {
+			//删牌
             string value = it->first;
             all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), value));
             //可能胡牌的个数
@@ -674,6 +675,8 @@ string checkTing() {
     }
     //找出sum最大的值
     if (hu_possibility.size() == 0) {
+		//看看能不能换两张牌以后听牌
+
         return "Fail";
     }
     else {
@@ -1425,12 +1428,58 @@ string eraseTwo() {
     return v[0];
 }
 
+//选择策略,true选择ppp，否则qqr
+// 1 ppp 2 qqr 3 五门齐 4 混一色
+//4 混一色 去掉字牌占一半
+//3   箭 2+ 风  1  每种颜色都有牌
+int chooseStrategy() {
+	//在这之前应该setMyCard完成了
+	//吃不是空时
+	if (!chi.empty()) {
+		return false;
+	}
+	if (!gang.empty()) {
+		return true;
+	}
+	//setMyCard();
+	//第一次ppp
+	int score = 0;
+	int total = 0;
+	for (auto it = my_active_card.begin(); it != my_active_card.end(); it++) {
+		total += it->second;
+		if (it->second > 1) {
+			score += it->second - 1;
+		}
+	}
+	if (score >= 5 * total / 14 && !chi.empty())
+		return 1;
+	//第二次ppp
+	score = 0;
+	total = 0;
+	for (auto it = my_active_card.begin(); it != my_active_card.end(); it++) {
+		total += it->second;
+		if (it->second > 1) {
+			score += it->second - 1;
+		}
+	}
+	if (score >= 3 * total / 14 && !chi.empty())
+		return 1;
+	//qqr
+	return 2;
+
+
+
+	return false;
+}
+
+
 
 /**
  * 挑选一张最适合出牌的牌
  * @return 最优的牌
  */
-string getBestCard() {
+//true意味着吃完  para = 1则ppp，para = 2 qqr
+string getBestCard(int para = 0) {
     setMyCard(my_player_id);
     //如果可以听牌还没写，写在这儿
     string ting = checkTing();
@@ -1443,44 +1492,53 @@ string getBestCard() {
     if (fj != "Fail") {
         return fj;
     }
-//    //从两头向中间除去间隔两个空位的单牌
-//    string esdouble = eraseDouble();
-//    if (esdouble != "Fail") {
-//        return esdouble;
-//    }
-//    //从两头向中间除去间隔一个空位的单牌
-//    string es = eraseSingle();
-//    if (es != "Fail") {
-//        return es;
-//    }
-    //删除单排
-    string si = single();
-    if (si != "Fail")
-        return si;
-    //删除没用的双排（虽然有可能送对方胡）
-    string ev = eraseVoid();
-    if (ev != "Fail")
-        return ev;
-    //删除双排
-    string et = eraseTwo();
-    if (et != "Fail")
-        return et;
-    //其他情况应该没有了，如果有就random吧
-    //什么都没有return的时候
-    random_shuffle(all_card[my_player_id].begin(), all_card[my_player_id].end());
-    auto it_return = all_card[my_player_id].begin();
-    while (it_return != all_card[my_player_id].end()) {
-        if ((*it_return)[0] != 'F' && (*it_return)[0] != 'J') {
-            break;
-        }
-        it_return++;
-    }
-    if (it_return != all_card[my_player_id].end()) {
-        return *it_return;
-    }
-    else {
-        return *(all_card[my_player_id].rbegin());
-    }
+	bool strategy = chooseStrategy();
+	setMyCard(my_player_id);
+	if (strategy) {
+		//从两头向中间除去间隔两个空位的单牌
+		//string esdouble = eraseDouble();
+		//if (esdouble != "Fail") {
+		//	return esdouble;
+		//}
+		//    //从两头向中间除去间隔一个空位的单牌
+		//    string es = eraseSingle();
+		//    if (es != "Fail") {
+		//        return es;
+		//    }
+			//删除单排
+		
+		string si = single();
+		if (si != "Fail")
+			return si;
+		//删除没用的双排（虽然有可能送对方胡）
+		string ev = eraseVoid();
+		if (ev != "Fail")
+			return ev;
+		//删除双排
+		string et = eraseTwo();
+		if (et != "Fail")
+			return et;
+		//其他情况应该没有了，如果有就random吧
+		//什么都没有return的时候
+		random_shuffle(all_card[my_player_id].begin(), all_card[my_player_id].end());
+		auto it_return = all_card[my_player_id].begin();
+		while (it_return != all_card[my_player_id].end()) {
+			if ((*it_return)[0] != 'F' && (*it_return)[0] != 'J') {
+				break;
+			}
+			it_return++;
+		}
+		if (it_return != all_card[my_player_id].end()) {
+			return *it_return;
+		}
+		else {
+			return *(all_card[my_player_id].rbegin());
+		}
+	}
+	else {
+		
+	}
+//    
 
     //以下是原来的，全部不要了，直接去除单排就好
 }
@@ -1578,7 +1636,7 @@ void responseOutTurn() {
         }
             //碰完就是否一定成功？ 这里是个问题
             //可以碰
-        else if (checkPeng(stmp)) {
+        else if (checkPeng(stmp) && (chooseStrategy() == 1 || (chooseStrategy() == 2 && stmp[0] == hunyise_main_huase()))) {
             str_out << "PENG ";
             //把PENG的牌处理一下
             for (int k = 1; k <= 2; k++)
@@ -1602,7 +1660,8 @@ void responseOutTurn() {
             all_card[my_player_id].push_back(value);//先存进来之后三个一起erase
             //这里新加
             //如果能听牌就吃
-            if (checkTing() != "Fail") {
+			setMyCard(my_player_id);
+            if (checkTing() != "Fail" || chooseStrategy() == 1 || (chooseStrategy() == 2 && hunyise_main_huase() == stmp[0])) {
                 //三个erase
                 all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), previousCard(stmp)));
                 all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
@@ -1622,6 +1681,7 @@ void responseOutTurn() {
         str_out << "PASS";
     }
 }
+
 void doBUGANG() {
     //需要删除peng中的，插入gang中的，并且输出bugang信息
 }
