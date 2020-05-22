@@ -75,6 +75,9 @@ int left_card_num[4] = { 21, 21, 21, 21 }; //34张初始发掉13张剩下21张
 //记录是否自摸（用来算番）
 bool is_ZIMO = false;
 
+//记录当前局的策略，用于debug
+int current_strategy = -1;
+
 /**
  * 快速生成牌名，注意是char
  * @param type 'W'
@@ -2088,6 +2091,7 @@ string getBestCard(int para = 0) {
         return fj;
     }*/
 	int strategy = chooseStrategy();
+    current_strategy = strategy;
 	if (strategy == STG_PENG_PENG) {
 		//F,J落单，就直接扔
 		string fj = getSingleFengOrJian();
@@ -2217,6 +2221,7 @@ void responseOutTurn() {
 
 		//先计算一下策略
         int strategy = chooseStrategy();
+        current_strategy = strategy;
 
         //如果可以抢牌胡
 		if (checkHu(all_card[my_player_id], stmp) && getFan(stmp) >= 8) {
@@ -2305,7 +2310,7 @@ int main() {
 #else
     //==========debug============
     Json::Reader reader;
-    string myin = string("{\"requests\":[\"0 2 2\",\"1 0 0 0 0 W1 F3 W3 T9 F2 W1 J2 B6 F3 T3 B3 T4 T3\",\"3 0 DRAW\",\"3 0 PLAY J2\",\"3 1 DRAW\",\"3 1 PLAY J2\",\"2 B3\",\"3 2 PLAY F2\",\"3 3 DRAW\",\"3 3 PLAY J3\",\"3 0 DRAW\",\"3 0 PLAY F2\",\"3 1 DRAW\",\"3 1 PLAY F3\"],\"responses\":[\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
+    string myin = string("{\"requests\":[\"0 2 1\",\"1 0 0 0 0 F3 T6 W5 B7 W2 T7 W1 B2 W9 T3 W4 W7 T5\",\"3 0 DRAW\",\"3 0 PLAY J2\",\"3 1 DRAW\",\"3 1 PLAY F3\",\"2 B3\",\"3 2 PLAY F3\",\"3 3 DRAW\",\"3 3 PLAY W8\",\"3 0 DRAW\",\"3 0 PLAY B8\",\"3 3 PENG B2\",\"3 0 DRAW\",\"3 0 PLAY B4\",\"3 1 DRAW\",\"3 1 PLAY B4\",\"3 2 CHI B3 W1\",\"3 3 DRAW\",\"3 3 PLAY B1\",\"3 0 DRAW\",\"3 0 PLAY B5\",\"3 1 DRAW\",\"3 1 PLAY B1\",\"2 F2\",\"3 2 PLAY F2\",\"3 3 DRAW\",\"3 3 PLAY J1\",\"3 0 DRAW\",\"3 0 PLAY B5\",\"3 1 DRAW\",\"3 1 PLAY J1\",\"2 W1\",\"3 2 PLAY W1\",\"3 3 DRAW\",\"3 3 PLAY T5\",\"3 0 DRAW\",\"3 0 PLAY B9\",\"3 1 DRAW\",\"3 1 PLAY J2\",\"2 F1\",\"3 2 PLAY F1\",\"3 3 DRAW\",\"3 3 PLAY T8\",\"3 0 DRAW\",\"3 0 PLAY B6\",\"3 1 CHI B6 B9\",\"2 W4\",\"3 2 PLAY B7\",\"3 3 DRAW\",\"3 3 PLAY W3\",\"3 0 DRAW\",\"3 0 PLAY B1\",\"3 1 DRAW\",\"3 1 PLAY F4\",\"2 B3\",\"3 2 PLAY B3\",\"3 3 DRAW\",\"3 3 PLAY J2\",\"3 0 DRAW\",\"3 0 PLAY W7\",\"3 1 CHI W7 J3\",\"2 W5\",\"3 2 PLAY W7\",\"3 3 DRAW\",\"3 3 PLAY T3\",\"3 0 DRAW\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY F4\",\"2 B2\",\"3 2 PLAY B2\",\"3 3 DRAW\",\"3 3 PLAY W3\",\"3 0 DRAW\",\"3 0 PLAY T3\",\"3 1 DRAW\",\"3 1 PLAY W2\",\"2 W3\",\"3 2 PLAY W3\",\"3 3 CHI W2 W5\",\"3 2 PENG W2\",\"3 3 DRAW\",\"3 3 PLAY F3\",\"3 0 DRAW\",\"3 0 PLAY T2\",\"3 1 DRAW\",\"3 1 PLAY B4\",\"2 J3\",\"3 2 PLAY J3\",\"3 3 DRAW\",\"3 3 PLAY T1\",\"3 0 DRAW\",\"3 0 PLAY B6\",\"3 1 DRAW\",\"3 1 PLAY F1\",\"3 3 PENG W5\",\"3 0 DRAW\",\"3 0 PLAY W8\",\"3 1 DRAW\",\"3 1 PLAY B9\",\"2 F3\",\"3 2 PLAY F3\",\"3 3 DRAW\",\"3 3 PLAY W3\",\"3 0 DRAW\",\"3 0 PLAY T1\",\"3 1 DRAW\",\"3 1 PLAY T2\",\"2 W6\",\"3 2 PLAY T3\",\"3 3 DRAW\",\"3 3 PLAY B7\",\"3 0 DRAW\",\"3 0 PLAY T1\",\"3 1 DRAW\",\"3 1 PLAY B3\",\"2 B8\",\"3 2 PLAY W6\",\"3 3 DRAW\",\"3 3 PLAY W7\",\"3 0 DRAW\",\"3 0 PLAY F2\",\"3 1 DRAW\",\"3 1 PLAY W9\",\"2 W4\",\"3 2 PLAY W9\",\"3 3 DRAW\",\"3 3 PLAY B9\",\"3 0 DRAW\",\"3 0 PLAY T8\",\"3 1 DRAW\",\"3 1 PLAY W2\",\"2 B3\",\"3 2 PLAY T5\",\"3 3 DRAW\",\"3 3 PLAY J3\",\"3 0 DRAW\",\"3 0 PLAY B6\",\"3 1 DRAW\",\"3 1 PLAY B6\",\"2 B2\",\"3 2 PLAY B8\",\"3 3 DRAW\",\"3 3 PLAY T2\",\"3 0 DRAW\",\"3 0 PLAY J1\",\"3 1 DRAW\",\"3 1 PLAY T9\",\"2 T6\",\"3 2 PLAY T7\",\"3 3 DRAW\",\"3 3 PLAY B7\",\"3 0 DRAW\",\"3 0 PLAY B1\",\"3 1 DRAW\",\"3 1 PLAY F2\"],\"responses\":[\"PASS\",\"PASS\",\"PASS\",\"PASS") + string("\",\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"CHI B3 W1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W3\",\"PASS\",\"PENG W2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY J3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W6\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
     reader.parse(myin, input_json);
     //==========debug============
 #endif
@@ -2355,6 +2360,16 @@ int main() {
     //Json交互的输出（删掉了普通交互）
     Json::Value outputJSON;
     outputJSON["response"] = response[turn_id];
+
+    //========debug==========
+    string stg;
+    if (current_strategy == STG_PENG_PENG) { stg = "碰碰胡";}
+    else if (current_strategy == STG_HUN_YI_SE) { stg = "混一色"; }
+    else if (current_strategy == STG_QUAN_QIU_REN) { stg = "全求人"; }
+    else if (current_strategy == STG_WU_MEN) { stg = "五门齐"; }
+    outputJSON["debug"] = stg;
+    //========debug==========
+
     cout << outputJSON << endl;
     return 0;
 }
