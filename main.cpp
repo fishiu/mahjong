@@ -1664,7 +1664,7 @@ string WuMenQi_bestcard() {
 		//针对组合的每一种颜色进行考察
 		char _color = _groups_inactive[i].second[0]; //当前考察的group的颜色
 		string _type = _groups_inactive[i].first; //当前考察的group的种类
-		int _number = _groups_inactive[i].second[1] + '0'; //当前考察的group的种类
+		int _number = _groups_inactive[i].second[1] - '0'; //当前考察的group的种类
 
 		vector<string> _color_cards = getColorActiveCards(_color);
 		int _color_cards_len = _color_cards.size();
@@ -1691,7 +1691,7 @@ string WuMenQi_bestcard() {
 	for (auto my_card_itr = my_active_card.begin(); my_card_itr != my_active_card.end(); ++my_card_itr) {
 		string _name = my_card_itr->first;
 		char _color = _name[0];
-		int _n = _name[1] + '0';
+		int _n = _name[1] - '0';
 
 		//如果这是一个碰（或杠）
 		if (my_card_itr->second >= 3) {
@@ -1754,7 +1754,7 @@ string WuMenQi_bestcard() {
 			}
 		}
 		color_cards_score[_name] = score_dist / color_cards.size() - rest_card[_name] - color_cards_itr->second * 2;
-		if (color_cards[previousCard(_name)] || color_cards[postCard(_name)])
+		if (color_cards.count(previousCard(_name)) || color_cards.count(postCard(_name)))
 			color_cards_score[_name] -= 2;
 	}
 	int max_score = -1000;
@@ -2305,7 +2305,7 @@ int main() {
 #else
     //==========debug============
     Json::Reader reader;
-    string myin = string("{\"requests\":[\"0 0 2\",\"1 0 0 0 0 B7 B4 T9 T2 T1 W4 B5 F1 W7 W1 F4 F4 B8\",\"2 W3\",\"3 0 PLAY F1\",\"3 3 PENG F3\",\"2 B6\",\"3 0 PLAY W1\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY F1\",\"3 3 DRAW\",\"3 3 PLAY J3\",\"2 B1\",\"3 0 PLAY B1\",\"3 1 DRAW\",\"3 1 PLAY F3\",\"3 2 DRAW\",\"3 2 PLAY W1\",\"3 3 DRAW\",\"3 3 PLAY B1\",\"2 B9\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY J1\",\"3 2 PENG B1\",\"3 3 DRAW\",\"3 3 PLAY W9\",\"2 W9\",\"3 0 PLAY W9\",\"3 1 DRAW\",\"3 1 PLAY J2\",\"3 2 DRAW\",\"3 2 PLAY B8\",\"3 3 DRAW\",\"3 3 PLAY B4\",\"3 1 PENG T1\",\"3 2 DRAW\",\"3 2 PLAY T2\",\"3 3 DRAW\",\"3 3 PLAY T5\",\"2 J2\",\"3 0 PLAY J2\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"3 3 DRAW\",\"3 3 PLAY B3\",\"3 0 CHI B4 W7\",\"3 1 DRAW\",\"3 1 PLAY W6\",\"3 2 DRAW\",\"3 2 PLAY F2\",\"3 3 DRAW\",\"3 3 PLAY T1\",\"2 W1\",\"3 0 PLAY W1\",\"3 1 DRAW\",\"3 1 PLAY T2\",\"3 2 DRAW\",\"3 2 PLAY W9\",\"3 3 DRAW\",\"3 3 PLAY T2\",\"2 W7\",\"3 0 PLAY W7\",\"3 1 DRAW\",\"3 1 PLAY W2\",\"3 2 DRAW\",\"3 2 PLAY J3\",\"3 3 DRAW\",\"3 3 PLAY T9\",\"2 T6\",\"3 0 PLAY T6\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY T6\",\"3 3 DRAW\",\"3 3 PLAY T6\",\"2 B2\",\"3 0 PLAY B2\",\"3 1 DRAW\",\"3 1 PLAY W7\",\"3 2 DRAW\",\"3 2 PLAY B5\",\"3 3 DRAW\",\"3 3 PLAY B2\",\"2 W3\",\"3 0 PLAY W3\",\"3 1 DRAW\",\"3 1 PLAY W2\",\"3 2 DRAW\",\"3 2 PLAY T5\",\"3 3 DRAW\",\"3 3 PLAY W2\"],\"responses\":[\"PASS\",\"PASS\",\"PLAY F1\",\"PASS\",\"PASS\",\"PLAY W1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"CHI B5 W7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY J2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"CHI B4 W7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T6\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
+    string myin = string("{\"requests\":[\"0 2 2\",\"1 0 0 0 0 W1 F3 W3 T9 F2 W1 J2 B6 F3 T3 B3 T4 T3\",\"3 0 DRAW\",\"3 0 PLAY J2\",\"3 1 DRAW\",\"3 1 PLAY J2\",\"2 B3\",\"3 2 PLAY F2\",\"3 3 DRAW\",\"3 3 PLAY J3\",\"3 0 DRAW\",\"3 0 PLAY F2\",\"3 1 DRAW\",\"3 1 PLAY F3\"],\"responses\":[\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
     reader.parse(myin, input_json);
     //==========debug============
 #endif
