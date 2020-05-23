@@ -26,6 +26,10 @@ using namespace std;
 ostringstream str_out;
 //字符串输入流
 istringstream str_in;
+//json输出
+Json::Value outputJSON;
+//debug信息
+string debug_info = "";
 
 //我的手牌，这个变量有问题，不能用
 //vector<string> my_card;
@@ -1445,8 +1449,12 @@ string eraseTwo() {
 }
 
 
-
-int ifpeng(int sscore) {
+/**
+ * 判断是否进碰碰胡
+ * @param sscore 参数
+ * @return bool 是否进入
+ */
+bool ifpeng(int sscore) {
     //第一次ppp
     int score = 0;
     int total = 0;
@@ -1456,10 +1464,7 @@ int ifpeng(int sscore) {
             score += it->second - 1;
         }
     }
-    if (score >= sscore * total / 14 && chi.empty())
-        return 1;
-    else
-        return 0;
+    return score >= sscore * total / 14 && chi.empty();
 }
 
 char hunyise_main_huase() {
@@ -1792,8 +1797,7 @@ bool checkColorWuMen(char color) {
  * @return 选择true 否则false
  */
 bool IfWuMenQi() {
-    int JF_cnt = 0;
-    bool flag_color = false;
+    //检查同一个花色的鸣牌，一票否决
     vector<string> group_color_cnt;
     for (int i = 0; i < my_pack.size(); ++i) {
         char c = my_pack[i].second.first[0];
@@ -1801,17 +1805,38 @@ bool IfWuMenQi() {
     }
     map<string, int> res = easy_make_map(group_color_cnt.begin(), group_color_cnt.end());
     for (auto itr = res.begin(); itr != res.end(); ++itr) {
+        //一旦有一个鸣牌出现过就两次，就不可能是五门齐
         if (itr->second > 1) {
             return false;
         }
     }
-    for (auto itr = my_active_card.begin(); itr != my_active_card.end(); ++itr) {
-        char color = itr->first[0];
-        if (color == 'F' || color == 'J') {
-            if (itr->second >= 2)
-                JF_cnt = 2;
-        }
+
+    //记录风和箭的最高数量
+    int max_feng_same = 0;
+    int max_jian_same = 0;
+    //计算风箭相同牌最高出现次数
+    vector<string> feng_vector;
+    vector<string> jian_vector;
+    for (int i = 0; i < all_card[my_player_id].size(); i++) {
+        string name = all_card[my_player_id][i];
+        if(name[0] == 'F')
+            feng_vector.push_back(name);
+        else if(name[0] == 'J')
+            jian_vector.push_back(name);
     }
+    //生成map计算相同的数量
+    map<string, int> feng_cnt_map = easy_make_map(feng_vector.begin(), feng_vector.end());
+    map<string, int> jian_cnt_map = easy_make_map(jian_vector.begin(), jian_vector.end());
+    for (auto itr = feng_cnt_map.begin(); itr != feng_cnt_map.end(); ++itr) {
+        if (max_feng_same < itr->second)
+            max_feng_same = itr->second;
+    }
+    for (auto itr = jian_cnt_map.begin(); itr != jian_cnt_map.end(); ++itr) {
+        if (max_jian_same < itr->second)
+            max_jian_same = itr->second;
+    }
+
+    //计算每种花色的数量
     int f_cnt = 0;
     int j_cnt = 0;
     int t_cnt = 0;
@@ -1831,9 +1856,14 @@ bool IfWuMenQi() {
                 w_cnt++; break;
         }
     }
-    if (t_cnt > 2 && w_cnt > 2 && b_cnt > 2)
-        flag_color = true;
-    return JF_cnt == 2 && flag_color;
+
+    //下面进行决策
+    if (turn_id <= 25)
+        //回合数比较少的时候，只要求数字牌每个花色两张，字牌至少各有一张
+        return t_cnt > 1 && w_cnt > 1 && b_cnt > 1 && max_feng_same && max_jian_same;
+    else
+        //回合数中等的时候，要求数字牌每个花色三张，字牌至少各有两张
+        return t_cnt > 2 && w_cnt > 2 && b_cnt > 2 && max_feng_same > 1 && max_jian_same > 1;
 }
 
 string quanqiuren_bestcard() {
@@ -2052,7 +2082,7 @@ int chooseStrategy() {
         return STG_HUN_YI_SE;
     }
 
-    if (ifpeng(5)) {
+    if (ifpeng(6)) {
         return STG_PENG_PENG;
     }
 
@@ -2064,7 +2094,7 @@ int chooseStrategy() {
         return STG_HUN_YI_SE;
     }
 
-    if (ifpeng(3)) {
+    if (ifpeng(4)) {
         return STG_PENG_PENG;
     }
 
@@ -2244,7 +2274,9 @@ void responseOutTurn() {
             //碰完就是否一定成功？ 这里是个问题
             //可以碰
         else if (checkPeng(stmp) &&
-                 ((strategy == STG_PENG_PENG || (strategy == STG_HUN_YI_SE && stmp[0] == hunyise_main_huase())) ||
+                 (strategy == STG_QUAN_QIU_REN ||
+                  strategy == STG_PENG_PENG ||
+                  (strategy == STG_HUN_YI_SE && stmp[0] == hunyise_main_huase()) ||
                   (strategy == STG_WU_MEN && checkColorWuMen(stmp[0])))) {
             str_out << "PENG ";
             //把PENG的牌处理一下
@@ -2359,8 +2391,6 @@ int main() {
         response.push_back(str_out.str());
     }
 
-    //Json交互的输出（删掉了普通交互）
-    Json::Value outputJSON;
     outputJSON["response"] = response[turn_id];
 
     //========debug==========
@@ -2369,7 +2399,8 @@ int main() {
     else if (current_strategy == STG_HUN_YI_SE) { stg = "混一色"; }
     else if (current_strategy == STG_QUAN_QIU_REN) { stg = "全求人"; }
     else if (current_strategy == STG_WU_MEN) { stg = "五门齐"; }
-    outputJSON["debug"] = stg;
+    debug_info += stg;
+    outputJSON["debug"] = debug_info;
     //========debug==========
 
     cout << outputJSON << endl;
