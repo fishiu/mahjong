@@ -37,3 +37,7 @@
 # Covers JetBrains IDEs: CLion
 /.idea
 /cmake-build-debug
+
+# vscode files
+/.vscode
+/build
