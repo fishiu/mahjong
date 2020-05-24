@@ -18,7 +18,7 @@
 #define STG_PENG_PENG 1
 #define STG_HUN_YI_SE 2
 #define STG_WU_MEN 3
-#define STG_QUAN_QIU_REN 3
+#define STG_QUAN_QIU_REN 4
 
 using namespace std;
 
@@ -373,286 +373,6 @@ int getFan(string);
  */
 int checkHu(vector<string> Cards, string gotCard) {
     return getFan(gotCard);
-    setMyCard(my_player_id);
-    unordered_map<string, int> newmap = my_active_card;
-    newmap[gotCard] = my_active_card[gotCard] + 1;
-    //vector<string> myCards;
-    //复制出一个vector方便操作
-    //myCards = Cards;
-    //如果是要了牌桌上的牌
-    //if (lastCards.size() == 2) {
-    //	myCards.push_back(lastCards);
-    //}
-    //如果是自己摸的牌
-    //if (gotCard.size() == 2) {
-    //myCards.push_back(gotCard);
-    //}
-    //两种情况下都把这个牌加入到序列中
-
-    //首先进行排序
-    //sort(myCards.begin(), myCards.end());
-    int duizi = 0;
-    int kezi = 0;
-    int shunzi = 0;
-    //int gangzi = 0;
-    /*
-    char flag = 'n';
-    //分别记录每种牌的vector
-    vector<string> B;
-    vector<string> W;
-    vector<string> T;
-    vector<string> F;
-    vector<string> J;
-    vector<string>::iterator it;
-    for (it = myCards.begin(); it < myCards.end(); it++) {
-        string str = *it;
-        if (str[0] == 'B') {
-            B.push_back(str);
-        }
-        else if (str[0] == 'W') {
-            W.push_back(str);
-        }
-        else if (str[0] == 'T') {
-            T.push_back(str);
-        }
-        else if (str[0] == 'F') {
-            F.push_back(str);
-        }
-        else if (str[0] == 'J') {
-            J.push_back(str);
-        }
-        //cout << *it << " ";
-    }
-    vector<vector<string> > zong;
-    zong.push_back(B);
-    zong.push_back(F);
-    zong.push_back(J);
-    zong.push_back(T);
-    zong.push_back(W);
-    vector<vector<string> >::iterator zongit;
-    */
-    /*
-    for (zongit = zong.begin(); zongit < zong.end(); zongit++) {
-        vector<string> vec = *zongit;
-        sort(vec.begin(), vec.end());
-        if (vec.size() >= 2) {
-            if (vec.size() >= 3) {
-                string str = vec[0];
-                //判断顺子
-                if (str[0] == 'B' || str[0] == 'T' || str[0] == 'W') {
-                    int cha = -1, pcha = 1, len = 1;
-                    for (int i = 1; i < vec.size(); i++) {
-                        cha = vec[i][1] - vec[i - 1][1];
-                        if (cha == pcha && cha == 1) {
-                            len++;
-                            if (len == 3) {
-                                shunzi++;
-                                len = 1;
-                                pcha = cha;
-                                continue;
-                            }
-                        }
-                        else {
-                            len = 1;
-                        }
-                        pcha = cha;
-                    }
-                }
-                //判断刻子和杠子
-                int tong = 1;
-                for (int i = 1; i < vec.size(); i++) {
-                    if (!strcmp(vec[i].c_str(), vec[i - 1].c_str())) {
-                        tong++;
-                        if (tong == 3) {
-                            kezi++;
-                            tong = 1;
-                        }
-                    }
-                    else {
-                        tong = 1;
-                    }
-                }
-            }
-            else {
-                //判断对子
-                int tong = 1;
-                for (int i = 1; i < vec.size(); i++) {
-                    if (!strcmp(vec[i].c_str(), vec[i - 1].c_str())) {
-                        tong++;
-                        if (tong == 2) {
-                            duizi++;
-                            tong = 1;
-                        }
-                    }
-                    else {
-                        tong = 1;
-                    }
-                }
-            }
-        }
-    }
-    */
-
-
-    for (int i = 1; i <= 9; i++) {
-        if (newmap[makeCardName('W', i)] >= 3) {
-            kezi++;
-            newmap[makeCardName('W', i)] -= 3;
-        }
-        if (newmap[makeCardName('B', i)] >= 3) {
-            kezi++;
-            newmap[makeCardName('B', i)] -= 3;
-        }
-        if (newmap[makeCardName('T', i)] >= 3) {
-            kezi++;
-            newmap[makeCardName('T', i)] -= 3;
-        }
-    }
-
-    for (int i = 1; i <= 7; i++) {
-        if (newmap[makeCardName('W', i)] && newmap[makeCardName('W', i + 1)] && newmap[makeCardName('W', i + 2)]) {
-            shunzi++;
-            i += 2;
-            newmap[makeCardName('W', i)]--;
-            newmap[makeCardName('W', i + 1)]--;
-            newmap[makeCardName('W', i + 2)]--;
-        }
-    }
-    for (int i = 1; i <= 7; i++) {
-        if (newmap[makeCardName('B', i)] && newmap[makeCardName('B', i + 1)] && newmap[makeCardName('B', i + 2)]) {
-            shunzi++;
-            i += 2;
-            newmap[makeCardName('B', i)]--;
-            newmap[makeCardName('B', i + 1)]--;
-            newmap[makeCardName('B', i + 2)]--;
-        }
-    }
-    for (int i = 1; i <= 7; i++) {
-        if (newmap[makeCardName('T', i)] && newmap[makeCardName('T', i + 1)] && newmap[makeCardName('T', i + 2)]) {
-            shunzi++;
-            i += 2;
-            newmap[makeCardName('T', i)]--;
-            newmap[makeCardName('T', i + 1)]--;
-            newmap[makeCardName('T', i + 2)]--;
-        }
-    }
-
-    for (int i = 1; i <= 9; i++) {
-        if (newmap[makeCardName('W', i)] == 2) {
-            duizi++;
-        }
-        if (newmap[makeCardName('B', i)] == 2) {
-            duizi++;
-        }
-        if (newmap[makeCardName('T', i)] == 2) {
-            duizi++;
-        }
-    }
-    for (int i = 1; i <= 4; i++) {
-        if (newmap[makeCardName('F', i)] >= 3) {
-            kezi++;
-        }
-        if (newmap[makeCardName('F', i)] == 2) {
-            duizi++;
-        }
-    }
-    for (int i = 1; i <= 3; i++) {
-        if (newmap[makeCardName('J', i)] >= 3) {
-            kezi++;
-        }
-        if (newmap[makeCardName('J', i)] == 2) {
-            duizi++;
-        }
-    }
-    //在这里加一个顺子刻子对子
-    shunzi += chi.size();
-    kezi += gang.size() + peng.size();
-    //测试用
-    //cout << "shunzi:" << shunzi << endl;
-    //cout << "kezi:" << kezi << endl;
-    //cout << "duizi:" << duizi << endl;
-
-    //删掉
-    //newmap[gotCard]=newmap[gotCard]-1;
-
-    //七连对
-    if (duizi == 7) {
-        return true;
-    }
-
-    //最正常的胡法
-    if (duizi >= 1 && kezi + shunzi >= 4) {
-        return true;
-    }
-
-    /*
-    //十三幺
-    if (shunzi == 0 && kezi == 0) {
-        char prenum = '0';
-        int feng = 0;
-        for (it = F.begin(); it != F.end(); it++) {
-            string str = *it;
-            if (str[1] != prenum) {
-                feng++;
-            }
-            prenum = str[1];
-        }
-        int jian = 0;
-        for (it = J.begin(); it != J.end(); it++) {
-            string str = *it;
-            if (str[1] != prenum) {
-                jian++;
-            }
-            prenum = str[1];
-        }
-        if (feng == 4 && jian == 3) {
-            int mainflag = 1;
-            int bflag = 0;
-            for (it = B.begin(); it != B.end(); it++) {
-                string str = *it;
-                if (bflag == 0 && str[1] == '1') {
-                    bflag++;
-                }
-                if (bflag == 1 && str[1] == '9') {
-                    bflag++;
-                }
-                if (str[1] != '1' && str[1] != '9') {    //存在别的牌说明十三幺不成立
-                    mainflag = 0;
-                    break;
-                }
-            }
-            int tflag = 0;
-            for (it = T.begin(); it != T.end(); it++) {
-                string str = *it;
-                if (tflag == 0 && str[1] == '1') {
-                    tflag++;
-                }
-                if (tflag == 1 && str[1] == '9') {
-                    tflag++;
-                }
-                if (str[1] != '1' && str[1] != '9') {    //存在别的牌说明十三幺不成立
-                    mainflag = 0;
-                    break;
-                }
-            }
-            int wflag = 0;
-            for (it = W.begin(); it != W.end(); it++) {
-                string str = *it;
-                if (wflag == 0 && str[1] == '1') {
-                    wflag++;
-                }
-                if (wflag == 1 && str[1] == '9') {
-                    wflag++;
-                }
-                if (str[1] != '1' && str[1] != '9') {    //存在别的牌说明十三幺不成立
-                    mainflag = 0;
-                    break;
-                }
-            }
-            if (mainflag == 1 && bflag == 2 && wflag == 2 && tflag == 2) return true;
-        }
-    }*/
-    return false;
 }
 
 
@@ -1500,9 +1220,9 @@ char hunyise_main_huase() {
 bool ifhunyise( int tongse_num, int zipai_num) {
     int tiao = 0, bin = 0, wan = 0;
     for (auto it = my_active_card.begin(); it != my_active_card.end(); it++) {
-        if (it->first[0] == 'W') wan++;
-        if (it->first[0] == 'B') bin++;
-        if (it->first[0] == 'T') tiao++;
+        if (it->first[0] == 'W') wan+=it->second;
+        if (it->first[0] == 'B') bin+=it->second;
+        if (it->first[0] == 'T') tiao+=it->second;
     }
     char max = 'n';
     int maxnum = 0;
@@ -2344,7 +2064,7 @@ int main() {
 #else
     //==========debug============
     Json::Reader reader;
-    string myin = string("{\"requests\":[\"0 3 2\",\"1 0 0 0 0 B6 B2 B5 T1 T3 F3 W5 T3 F2 W8 F3 T9 T4\",\"3 0 DRAW\",\"3 0 PLAY F1\",\"3 1 DRAW\",\"3 1 PLAY F1\",\"3 2 DRAW\",\"3 2 PLAY F4\",\"2 T6\",\"3 3 PLAY T9\",\"3 0 DRAW\",\"3 0 PLAY F4\",\"3 1 DRAW\",\"3 1 PLAY F4\",\"3 2 DRAW\",\"3 2 PLAY J2\",\"2 W9\",\"3 3 PLAY T1\",\"3 0 DRAW\",\"3 0 PLAY W2\",\"3 1 DRAW\",\"3 1 PLAY T4\",\"3 2 DRAW\",\"3 2 PLAY B1\",\"2 W6\",\"3 3 PLAY W5\",\"3 0 DRAW\",\"3 0 PLAY W9\",\"3 1 DRAW\",\"3 1 PLAY T5\",\"3 2 DRAW\",\"3 2 PLAY T1\",\"2 W2\",\"3 3 PLAY W2\",\"3 0 DRAW\",\"3 0 PLAY T1\",\"3 1 DRAW\",\"3 1 PLAY B2\",\"3 2 DRAW\",\"3 2 GANG\",\"3 2 DRAW\",\"3 2 PLAY T9\",\"2 B1\",\"3 3 PLAY B2\",\"3 0 DRAW\",\"3 0 PLAY W9\",\"3 1 DRAW\",\"3 1 PLAY W3\",\"3 2 PENG W2\",\"2 J1\",\"3 3 PLAY B1\",\"3 0 DRAW\",\"3 0 PLAY T9\",\"3 1 CHI T8 T7\",\"3 2 DRAW\",\"3 2 PLAY W5\",\"2 J2\",\"3 3 PLAY T6\",\"3 0 DRAW\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY T4\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"2 W7\",\"3 3 PLAY W6\",\"3 0 CHI W6 B3\",\"3 1 DRAW\",\"3 1 PLAY B5\",\"3 2 DRAW\",\"3 2 PLAY B1\"],\"responses\":[\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T6\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W6\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
+    string myin = string("{\"requests\":[\"0 3 0\",\"1 0 0 0 0 T2 J1 W5 W2 T1 T5 B2 J3 B9 F4 T7 J3 J2\",\"3 0 DRAW\",\"3 0 PLAY F3\",\"3 1 DRAW\",\"3 1 PLAY F1\",\"3 2 DRAW\",\"3 2 PLAY F3\",\"2 B7\",\"3 3 PLAY B7\",\"3 0 CHI B6 B1\",\"3 1 DRAW\",\"3 1 PLAY F3\",\"3 2 DRAW\",\"3 2 PLAY J3\",\"2 T6\",\"3 3 PLAY T6\",\"3 0 DRAW\",\"3 0 PLAY W9\",\"3 1 DRAW\",\"3 1 PLAY T1\",\"3 2 DRAW\",\"3 2 PLAY W9\",\"2 F1\",\"3 3 PLAY B9\",\"3 0 PENG W6\",\"3 1 DRAW\",\"3 1 PLAY T9\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"2 W1\",\"3 3 PLAY F1\",\"3 0 DRAW\",\"3 0 PLAY F2\",\"3 1 DRAW\",\"3 1 PLAY W1\",\"3 2 DRAW\",\"3 2 PLAY B7\",\"2 F2\",\"3 3 PLAY F2\",\"3 0 DRAW\",\"3 0 PLAY F2\",\"3 1 DRAW\",\"3 1 PLAY J1\",\"3 2 DRAW\",\"3 2 PLAY B4\",\"2 T3\",\"3 3 PLAY F4\",\"3 0 DRAW\",\"3 0 PLAY T8\",\"3 1 DRAW\",\"3 1 PLAY B2\",\"3 2 DRAW\",\"3 2 PLAY W7\",\"2 B8\",\"3 3 PLAY J1\",\"3 0 DRAW\",\"3 0 PLAY T8\",\"3 1 DRAW\",\"3 1 PLAY F1\",\"3 2 DRAW\",\"3 2 PLAY T4\",\"3 3 CHI T3 J2\",\"3 0 DRAW\",\"3 0 PLAY T3\",\"3 1 DRAW\",\"3 1 PLAY T8\",\"3 2 DRAW\",\"3 2 PLAY W4\",\"2 T1\",\"3 3 PLAY B2\",\"3 0 DRAW\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY B5\",\"3 2 DRAW\",\"3 2 PLAY T4\",\"2 W7\",\"3 3 PLAY B8\",\"3 0 DRAW\",\"3 0 PLAY B3\",\"3 2 GANG\",\"3 2 DRAW\",\"3 2 PLAY W5\",\"2 T3\",\"3 3 PLAY T3\",\"3 0 DRAW\",\"3 0 PLAY B2\",\"3 1 DRAW\",\"3 1 PLAY T6\",\"3 2 DRAW\",\"3 2 PLAY T6\",\"3 3 CHI T6 W7\",\"3 0 DRAW\",\"3 0 PLAY F1\",\"3 1 DRAW\",\"3 1 PLAY F4\",\"3 2 DRAW\",\"3 2 PLAY B4\",\"2 B1\",\"3 3 PLAY B1\",\"3 0 DRAW\",\"3 0 PLAY W7\",\"3 1 DRAW\",\"3 1 PLAY F4\",\"3 2 DRAW\",\"3 2 PLAY B4\",\"2 J3\",\"3 3 PLAY W5\",\"3 0 DRAW\",\"3 0 PLAY T2\",\"3 1 DRAW\",\"3 1 PLAY T9\",\"3 2 DRAW\",\"3 2 PLAY B8\",\"2 B7\",\"3 3 PLAY B7\",\"3 0 DRAW\",\"3 0 PLAY J1\",\"3 1 DRAW\",\"3 1 PLAY B8\",\"3 2 DRAW\",\"3 2 PLAY T9\"],\"responses\":[\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T6\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY J1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"P") + string("ASS\",\"CHI T3 J2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"CHI T6 W7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
     reader.parse(myin, input_json);
     //==========debug============
 #endif
