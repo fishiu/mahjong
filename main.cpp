@@ -432,7 +432,7 @@ string checkTing() {
 //可以考虑加上出手里最少的牌型
 string single() {
     setMyCard(my_player_id);
-    for (int remain = 3; remain >= 0; remain--) {
+    for (int remain = 4; remain >= 1; remain--) {
         for (int i = 1; i <= 4; i++) {
             if (my_active_card[makeCardName('F', i)] == 1 && getCardNumAll(makeCardName('F', i)) == remain) {
                 return makeCardName('F', i);
@@ -1194,6 +1194,22 @@ char hunyise_main_huase() {
         if (it->first[0] == 'B') bin++;
         if (it->first[0] == 'T') tiao++;
     }
+    //之前漏写了，要算所有的pengchigang
+    for (auto it = peng.begin(); it != peng.end(); it++) {
+        if (it[0] == 'W') wan += 3;
+        if (it[0] == 'B') bin += 3;
+        if (it[0] == 'T') tiao += 3;
+    }
+    for (auto it = chi.begin(); it != chi.end(); it++) {
+        if (it[0] == 'W') wan += 3;
+        if (it[0] == 'B') bin += 3;
+        if (it[0] == 'T') tiao += 3;
+    }
+    for (auto it = gang.begin(); it != gang.end(); it++) {
+        if (it[0] == 'W') wan += 3;
+        if (it[0] == 'B') bin += 3;
+        if (it[0] == 'T') tiao += 3;
+    }
     char max = 'n';
     int maxnum = 0;
     if (tiao >= maxnum) {
@@ -1217,12 +1233,28 @@ char hunyise_main_huase() {
  *第二个参数对目前主花色的牌数量的要求数量
  *第三个参数是要求有字牌的数量 取 0,1,2
 */
-bool ifhunyise( int tongse_num, int zipai_num) {
+bool ifhunyise( int tongse_num) {
     int tiao = 0, bin = 0, wan = 0;
     for (auto it = my_active_card.begin(); it != my_active_card.end(); it++) {
         if (it->first[0] == 'W') wan+=it->second;
         if (it->first[0] == 'B') bin+=it->second;
         if (it->first[0] == 'T') tiao+=it->second;
+    }
+    //之前漏写了，要算所有的pengchigang
+    for (auto it = peng.begin(); it != peng.end(); it++) {
+        if (it[0] == 'W') wan += 3;
+        if (it[0] == 'B') bin += 3;
+        if (it[0] == 'T') tiao += 3;
+    }
+    for (auto it = chi.begin(); it != chi.end(); it++) {
+        if (it[0] == 'W') wan += 3;
+        if (it[0] == 'B') bin += 3;
+        if (it[0] == 'T') tiao += 3;
+    }
+    for (auto it = gang.begin(); it != gang.end(); it++) {
+        if (it[0] == 'W') wan += 3;
+        if (it[0] == 'B') bin += 3;
+        if (it[0] == 'T') tiao += 3;
     }
     char max = 'n';
     int maxnum = 0;
@@ -1239,6 +1271,7 @@ bool ifhunyise( int tongse_num, int zipai_num) {
         maxnum = wan;
     }
     //return max;
+
     char huase = max;
     for (auto it = peng.begin(); it != peng.end(); it++) {
         if ((*it)[0] != huase) return false;
@@ -1249,31 +1282,31 @@ bool ifhunyise( int tongse_num, int zipai_num) {
     for (auto it = gang.begin(); it != gang.end(); it++) {
         if ((*it)[0] != huase) return false;
     }
-
-    int flag = 0;
-    for (int i = 1; i <= 3; i++) {
-        if (my_active_card[makeCardName('J', i)] >= zipai_num) flag = 1;
-    }
-    for (int i = 1; i <= 4; i++) {
-        if (my_active_card[makeCardName('F', i)] >= zipai_num) flag = 1;
-    }
-    if (flag == 0) return false;
+    //为什么要有这种要求？
+    //int flag = 0;
+    //for (int i = 1; i <= 3; i++) {
+    //   if (my_active_card[makeCardName('J', i)] >= zipai_num) flag = 1;
+    //}
+    //for (int i = 1; i <= 4; i++) {
+    //   if (my_active_card[makeCardName('F', i)] >= zipai_num) flag = 1;
+    //}
+    //if (flag == 0) return false;
 
     int counter = 0;
     for (auto it = my_active_card.begin(); it != my_active_card.end(); it++) {
-        if (it->first[0] == huase) {
+        if (it->first[0] == huase || it->first[0] == huase == 'F' || it->first[0] == huase == 'J') {
             counter += it->second;
         }
     }
 
     for (auto it = peng.begin(); it != peng.end(); it++) {
-        if ((*it)[0] == huase) counter += 3;
+        if ((*it)[0] == huase || (*it)[0] == 'F' || (*it)[0] ==  'J' ) counter += 3;
     }
     for (auto it = chi.begin(); it != chi.end(); it++) {
-        if ((*it)[0] == huase) counter += 3;
+        if ((*it)[0] == huase || (*it)[0] == 'F' || (*it)[0] == 'J') counter += 3;
     }
     for (auto it = gang.begin(); it != gang.end(); it++) {
-        if ((*it)[0] == huase) counter += 3;
+        if ((*it)[0] == huase || (*it)[0] == 'F' || (*it)[0] == 'J') counter += 3;
     }
 
     if (counter >= tongse_num) return true;
@@ -1797,8 +1830,14 @@ string quanqiuren_bestcard() {
 int chooseStrategy() {
     //在这之前应该setMyCard完成了
     //吃不是空时
-
-    if (ifhunyise(8, 2)) {
+    int addition = 0;
+    if (turnID > 50) {
+        addition = 1;
+    }
+    else if (turnID > 100) {
+        addtion = 2;
+    }
+    if (ifhunyise(9 + addition)) {
         return STG_HUN_YI_SE;
     }
 
@@ -1807,10 +1846,10 @@ int chooseStrategy() {
     }
 
     if (IfWuMenQi()) {
-        return STG_HUN_YI_SE;
+        return STG_WU_MEN;
     }
 
-    if (ifhunyise(6, 1)) {
+    if (ifhunyise(7 + addition * 2)) {
         return STG_HUN_YI_SE;
     }
 
@@ -1996,7 +2035,7 @@ void responseOutTurn() {
         else if (checkPeng(stmp) &&
                  (strategy == STG_QUAN_QIU_REN ||
                   strategy == STG_PENG_PENG ||
-                  (strategy == STG_HUN_YI_SE && stmp[0] == hunyise_main_huase()) ||
+                  (strategy == STG_HUN_YI_SE && (stmp[0] == hunyise_main_huase() || stmp[0] == 'F' || stmp[0] == 'J' )) ||
                   (strategy == STG_WU_MEN && checkColorWuMen(stmp[0])))) {
             str_out << "PENG ";
             //把PENG的牌处理一下
@@ -2022,7 +2061,7 @@ void responseOutTurn() {
             //如果能听牌就吃
             setMyCard(my_player_id);
             if (checkTing() != "Fail" || strategy == STG_QUAN_QIU_REN ||
-                (strategy == STG_HUN_YI_SE && hunyise_main_huase() == stmp[0]) ||
+                (strategy == STG_HUN_YI_SE && (stmp[0] == hunyise_main_huase() || stmp[0] == 'F' || stmp[0] == 'J')) ||
                 (strategy == STG_WU_MEN && checkColorWuMen(stmp[0]))) {
                 //三个erase
                 all_card[my_player_id].erase(
@@ -2147,19 +2186,19 @@ int main() {
  *          \  \ `_.   \_ __\ /__ _/   .-` /  /
  *      =====`-.____`.___ \_____/___.-`___.-'=====
  *                        `=---='
- * 
- * 
+ *
+ *
  *      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * 
+ *
  *            佛祖保佑       永不宕机     永无BUG
- * 
- *        佛曰:  
- *                写字楼里写字间，写字间里程序员；  
- *                程序人员写程序，又拿程序换酒钱。  
- *                酒醒只在网上坐，酒醉还来网下眠；  
- *                酒醉酒醒日复日，网上网下年复年。  
- *                但愿老死电脑间，不愿鞠躬老板前；  
- *                奔驰宝马贵者趣，公交自行程序员。  
- *                别人笑我忒疯癫，我笑自己命太贱；  
+ *
+ *        佛曰:
+ *                写字楼里写字间，写字间里程序员；
+ *                程序人员写程序，又拿程序换酒钱。
+ *                酒醒只在网上坐，酒醉还来网下眠；
+ *                酒醉酒醒日复日，网上网下年复年。
+ *                但愿老死电脑间，不愿鞠躬老板前；
+ *                奔驰宝马贵者趣，公交自行程序员。
+ *                别人笑我忒疯癫，我笑自己命太贱；
  *                不见满街漂亮妹，哪个归得程序员？
  */
