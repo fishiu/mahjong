@@ -164,6 +164,7 @@ int getCardNumAll(string card_name) {
     }
     return _cnt;
 }
+
 /*获取牌堆中剩下的牌 + 别人手中的牌*/
 void getRestCard() {
     for (int i = 1; i <= 9; i++) {
@@ -192,6 +193,28 @@ void getAllCard() {
     for (int i = 1; i <= 3; i++) {
         all_rest_card[makeCardName('J', i)] = getCardNumAll(makeCardName('J', i));
     }
+}
+
+/**
+ * 生成我的所有手牌的vector，包括鸣牌和暗牌
+ * @return vector<string>
+ */
+vector<string> getAllMyCard() {
+    vector<string> _v = all_card[my_player_id];
+    for (int i = 0; i < chi.size(); ++i) {
+        _v.push_back(chi[i]);
+        _v.push_back(postCard(chi[i]));
+        _v.push_back(previousCard(chi[i]));
+    }
+    for (int i = 0; i < peng.size(); ++i) {
+        for (int j = 0; j < 3; ++j)
+            _v.push_back(peng[i]);
+    }
+    for (int i = 0; i < gang.size(); ++i) {
+        for (int j = 0; j < 4; ++j)
+            _v.push_back(gang[i]);
+    }
+    return _v;
 }
 
 /**
@@ -1570,13 +1593,15 @@ bool IfWuMenQi() {
     //计算风箭相同牌最高出现次数
     vector<string> feng_vector;
     vector<string> jian_vector;
-    for (int i = 0; i < all_card[my_player_id].size(); i++) {
-        string name = all_card[my_player_id][i];
+    vector<string> _all_my_card = getAllMyCard();
+    for (int i = 0; i < _all_my_card.size(); i++) {
+        string name = _all_my_card[i];
         if(name[0] == 'F')
             feng_vector.push_back(name);
         else if(name[0] == 'J')
             jian_vector.push_back(name);
     }
+
     //生成map计算相同的数量
     map<string, int> feng_cnt_map = easy_make_map(feng_vector.begin(), feng_vector.end());
     map<string, int> jian_cnt_map = easy_make_map(jian_vector.begin(), jian_vector.end());
@@ -1595,8 +1620,8 @@ bool IfWuMenQi() {
     int t_cnt = 0;
     int w_cnt = 0;
     int b_cnt = 0;
-    for (int j = 0; j < all_card[my_player_id].size(); ++j) {
-        switch (all_card[my_player_id][j][0]) {
+    for (int j = 0; j < _all_my_card.size(); ++j) {
+        switch (_all_my_card[j][0]) {
             case 'F':
                 f_cnt++; break;
             case 'J':
