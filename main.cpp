@@ -1196,19 +1196,19 @@ char hunyise_main_huase() {
     }
     //之前漏写了，要算所有的pengchigang
     for (auto it = peng.begin(); it != peng.end(); it++) {
-        if (it[0] == 'W') wan += 3;
-        if (it[0] == 'B') bin += 3;
-        if (it[0] == 'T') tiao += 3;
+        if ((*it)[0] == 'W') wan += 3;
+        if ((*it)[0] == 'B') bin += 3;
+        if ((*it)[0] == 'T') tiao += 3;
     }
     for (auto it = chi.begin(); it != chi.end(); it++) {
-        if (it[0] == 'W') wan += 3;
-        if (it[0] == 'B') bin += 3;
-        if (it[0] == 'T') tiao += 3;
+        if ((*it)[0] == 'W') wan += 3;
+        if ((*it)[0] == 'B') bin += 3;
+        if ((*it)[0] == 'T') tiao += 3;
     }
     for (auto it = gang.begin(); it != gang.end(); it++) {
-        if (it[0] == 'W') wan += 3;
-        if (it[0] == 'B') bin += 3;
-        if (it[0] == 'T') tiao += 3;
+        if ((*it)[0] == 'W') wan += 3;
+        if ((*it)[0] == 'B') bin += 3;
+        if ((*it)[0] == 'T') tiao += 3;
     }
     char max = 'n';
     int maxnum = 0;
@@ -1242,19 +1242,19 @@ bool ifhunyise( int tongse_num) {
     }
     //之前漏写了，要算所有的pengchigang
     for (auto it = peng.begin(); it != peng.end(); it++) {
-        if (it[0] == 'W') wan += 3;
-        if (it[0] == 'B') bin += 3;
-        if (it[0] == 'T') tiao += 3;
+        if ((*it)[0] == 'W') wan += 3;
+        if ((*it)[0] == 'B') bin += 3;
+        if ((*it)[0] == 'T') tiao += 3;
     }
     for (auto it = chi.begin(); it != chi.end(); it++) {
-        if (it[0] == 'W') wan += 3;
-        if (it[0] == 'B') bin += 3;
-        if (it[0] == 'T') tiao += 3;
+        if ((*it)[0] == 'W') wan += 3;
+        if ((*it)[0] == 'B') bin += 3;
+        if ((*it)[0] == 'T') tiao += 3;
     }
     for (auto it = gang.begin(); it != gang.end(); it++) {
-        if (it[0] == 'W') wan += 3;
-        if (it[0] == 'B') bin += 3;
-        if (it[0] == 'T') tiao += 3;
+        if ((*it)[0] == 'W') wan += 3;
+        if ((*it)[0] == 'B') bin += 3;
+        if ((*it)[0] == 'T') tiao += 3;
     }
     char max = 'n';
     int maxnum = 0;
@@ -1831,11 +1831,11 @@ int chooseStrategy() {
     //在这之前应该setMyCard完成了
     //吃不是空时
     int addition = 0;
-    if (turnID > 50) {
+    if (turn_id > 50) {
         addition = 1;
     }
-    else if (turnID > 100) {
-        addtion = 2;
+    else if (turn_id > 100) {
+        addition = 2;
     }
     if (ifhunyise(9 + addition)) {
         return STG_HUN_YI_SE;
