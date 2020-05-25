@@ -1437,7 +1437,8 @@ vector<string> getColorActiveCards(char color) {
     vector<string> _v;
     for (auto itr = my_active_card.begin(); itr != my_active_card.end(); ++itr) {
         if (itr->second && itr->first[0] == color) {
-            _v.push_back(itr->first);
+            for (int i = 0; i < itr->second; ++i)
+                _v.push_back(itr->first);
         }
     }
     return _v;
@@ -1525,7 +1526,7 @@ string WuMenQi_bestcard() {
     string color_list = "BTWFJ";
     char target_color = 'B';
     int color_cnt_max = 0;
-    int max_count = 1;
+    int max_count = 0;
     for (int i = 0; i < 5; ++i) {
         int color_cnt = getColorActiveCards(color_list[i]).size();
         if (color_cnt >= color_cnt_max) {
@@ -1534,7 +1535,7 @@ string WuMenQi_bestcard() {
             if (color_cnt == color_cnt_max)
                 max_count++;
             else
-                max_count = 1;
+                max_count = 0;
         }
     }
 
