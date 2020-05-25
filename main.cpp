@@ -447,31 +447,6 @@ string checkTing() {
         return throw_card;
     }
 }
-
-char my_active_main_color() {
-	char zhuse = 'n';
-	int maxnum = 0;
-	int tiao = 0, bing = 0, wan = 0;
-	for (auto it = my_active_card.begin(); it != my_active_card.end(); it++) {
-		if (it->first[0] == 'T') tiao += it->second;
-		if (it->first[0] == 'B') bing += it->second;
-		if (it->first[0] == 'W') wan += it->second;
-	}
-	if (tiao > maxnum) {
-		zhuse = 'T';
-		maxnum = tiao;
-	}
-	if (bing > maxnum) {
-		zhuse = 'B';
-		maxnum = bing;
-	}
-	if (wan > maxnum) {
-		zhuse = 'W';
-		maxnum = wan;
-	}
-	return zhuse;
-}
-
 /**
  * 从两头向中间除去单牌 W,B,T
  * @return 相应的牌名 如果找不到返回 Fail
@@ -480,7 +455,6 @@ char my_active_main_color() {
 //可以考虑加上出手里最少的牌型
 string single() {
     setMyCard(my_player_id);
-	char main_huapai = my_active_main_color();
     for (int remain = 4; remain >= 1; remain--) {
         for (int i = 1; i <= 4; i++) {
             if (my_active_card[makeCardName('F', i)] == 1 && getCardNumAll(makeCardName('F', i)) == remain) {
@@ -494,12 +468,6 @@ string single() {
         }
         int i = 1, j = 9;
         for (; i <= j; i++, j--) {
-			if (my_active_card[makeCardName(main_huapai, i)] == 1 && getCardNumAll(makeCardName(main_huapai, i)) == remain) {
-				return makeCardName(main_huapai, i);
-			}
-			if (j != i && my_active_card[makeCardName(main_huapai, j)] == 1 && getCardNumAll(makeCardName(main_huapai, j)) == remain) {
-				return makeCardName(main_huapai, j);
-			}
             if (my_active_card[makeCardName('W', i)] == 1 && getCardNumAll(makeCardName('W', i)) == remain) {
                 return makeCardName('W', i);
             }
@@ -1335,47 +1303,40 @@ bool ifhunyise( int tongse_num) {
 
     char huase = max;
     for (auto it = peng.begin(); it != peng.end(); it++) {
-        if ((*it)[0] != huase &&(*it)[0]!='F'&&(*it)[0]!='J') return false;
+        if ((*it)[0] != huase) return false;
     }
     for (auto it = chi.begin(); it != chi.end(); it++) {
-        if ((*it)[0] != huase && (*it)[0] != 'F' && (*it)[0] != 'J') return false;
+        if ((*it)[0] != huase) return false;
     }
     for (auto it = gang.begin(); it != gang.end(); it++) {
-        if ((*it)[0] != huase && (*it)[0] != 'F' && (*it)[0] != 'J') return false;
+        if ((*it)[0] != huase) return false;
     }
     //为什么要有这种要求？
     //int flag = 0;
-	//int max_zipai_num = 0;
-    /*for (int i = 1; i <= 3; i++) {
-       if (my_active_card[makeCardName('J', i)] >= max_zipai_num) max_zipai_num = my_active_card[makeCardName('J', i)];
-    }
-    for (int i = 1; i <= 4; i++) {
-       if (my_active_card[makeCardName('F', i)] >= max_zipai_num) max_zipai_num = my_active_card[makeCardName('F', i)];
-    }
+    //for (int i = 1; i <= 3; i++) {
+    //   if (my_active_card[makeCardName('J', i)] >= zipai_num) flag = 1;
+    //}
+    //for (int i = 1; i <= 4; i++) {
+    //   if (my_active_card[makeCardName('F', i)] >= zipai_num) flag = 1;
+    //}
     //if (flag == 0) return false;
-	if (max_zipai_num > 2) max_zipai_num = 2;
-	*/
+
     int counter = 0;
     for (auto it = my_active_card.begin(); it != my_active_card.end(); it++) {
-        if (it->first[0] == huase) {
+        if (it->first[0] == huase || it->first[0] == huase == 'F' || it->first[0] == huase == 'J') {
             counter += it->second;
         }
-		if ((it->first[0] == 'F' || it->first[0] == 'J')&&it->second>1) {
-			counter += it->second;
-		}
     }
 
     for (auto it = peng.begin(); it != peng.end(); it++) {
-        if ((*it)[0] == huase || (*it)[0] != 'F' || (*it)[0] != 'J') counter += 3;
+        if ((*it)[0] == huase || (*it)[0] == 'F' || (*it)[0] ==  'J' ) counter += 3;
     }
     for (auto it = chi.begin(); it != chi.end(); it++) {
-        if ((*it)[0] == huase || (*it)[0] != 'F' || (*it)[0] != 'J') counter += 3;
+        if ((*it)[0] == huase || (*it)[0] == 'F' || (*it)[0] == 'J') counter += 3;
     }
     for (auto it = gang.begin(); it != gang.end(); it++) {
-        if ((*it)[0] == huase || (*it)[0] != 'F' || (*it)[0] != 'J') counter += 3;
+        if ((*it)[0] == huase || (*it)[0] == 'F' || (*it)[0] == 'J') counter += 3;
     }
-
-	//counter += max_zipai_num;
 
     if (counter >= tongse_num) return true;
     return false;
