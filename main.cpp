@@ -1303,18 +1303,18 @@ bool ifhunyise( int tongse_num) {
 
     char huase = max;
     for (auto it = peng.begin(); it != peng.end(); it++) {
-        if ((*it)[0] != huase) return false;
+        if ((*it)[0] != huase &&(*it)[0]!='F'&&(*it)[0]!='J') return false;
     }
     for (auto it = chi.begin(); it != chi.end(); it++) {
-        if ((*it)[0] != huase) return false;
+        if ((*it)[0] != huase && (*it)[0] != 'F' && (*it)[0] != 'J') return false;
     }
     for (auto it = gang.begin(); it != gang.end(); it++) {
-        if ((*it)[0] != huase) return false;
+        if ((*it)[0] != huase && (*it)[0] != 'F' && (*it)[0] != 'J') return false;
     }
     //为什么要有这种要求？
     //int flag = 0;
-	int max_zipai_num = 0;
-    for (int i = 1; i <= 3; i++) {
+	//int max_zipai_num = 0;
+    /*for (int i = 1; i <= 3; i++) {
        if (my_active_card[makeCardName('J', i)] >= max_zipai_num) max_zipai_num = my_active_card[makeCardName('J', i)];
     }
     for (int i = 1; i <= 4; i++) {
@@ -1322,25 +1322,28 @@ bool ifhunyise( int tongse_num) {
     }
     //if (flag == 0) return false;
 	if (max_zipai_num > 2) max_zipai_num = 2;
-
+	*/
     int counter = 0;
     for (auto it = my_active_card.begin(); it != my_active_card.end(); it++) {
         if (it->first[0] == huase) {
             counter += it->second;
         }
+		if ((it->first[0] == 'F' || it->first[0] == 'J')&&it->second>1) {
+			counter += it->second;
+		}
     }
 
     for (auto it = peng.begin(); it != peng.end(); it++) {
-        if ((*it)[0] == huase) counter += 3;
+        if ((*it)[0] == huase || (*it)[0] != 'F' || (*it)[0] != 'J') counter += 3;
     }
     for (auto it = chi.begin(); it != chi.end(); it++) {
-        if ((*it)[0] == huase) counter += 3;
+        if ((*it)[0] == huase || (*it)[0] != 'F' || (*it)[0] != 'J') counter += 3;
     }
     for (auto it = gang.begin(); it != gang.end(); it++) {
-        if ((*it)[0] == huase) counter += 3;
+        if ((*it)[0] == huase || (*it)[0] != 'F' || (*it)[0] != 'J') counter += 3;
     }
 
-	counter += max_zipai_num;
+	//counter += max_zipai_num;
 
     if (counter >= tongse_num) return true;
     return false;
