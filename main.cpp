@@ -667,19 +667,12 @@ bool checkGang(string newCard) {
 
 /**
  * 判断是否是绝张胡
- * 逐个判断每一张手牌是不是绝张（桌上已经有了三张）
+ * 判断wintile是不是绝张（已经确定已经有了三张）
  * @return true 确实绝张胡，false 不是绝张胡
  */
-bool isJueZhang() {
-    for (auto& i : my_active_card) {
-        string _card = i.first;
-        int cnt = 0;
-        for (int j = 0; j < all_card[4].size(); ++j)
-            if (all_card[4][j] == _card)
-                cnt++;
-        if (i.second > 0 && cnt == 3)
-            return true;
-    }
+bool isJueZhang(string win_tile) {
+    if (getCardNumAll(win_tile) - my_active_card[win_tile] == 3)
+        return true;
     return false;
 }
 
@@ -730,7 +723,7 @@ int getFan(string win_tile) {
     }
     //用itmp判断自摸不对
     //bool is_ZIMO = (itmp == 2); //是否是自摸
-    bool is_JUEZHANG = isJueZhang(); //绝张和
+    bool is_JUEZHANG = isJueZhang(win_tile); //绝张和
     bool is_GANG = 0; //杠上开花
     bool is_LAST = (flower_count + not_flower_count >= 144); //排墙最后一张
     int MEN_FENG = my_player_id; //门风
@@ -2203,7 +2196,7 @@ int main() {
 #else
     //==========debug============
     Json::Reader reader;
-    string myin = string("{\"requests\":[\"0 0 1\",\"1 0 0 0 0 B4 T6 B8 B4 W5 W8 J1 B4 T7 J1 F4 F2 W7\",\"2 T9\",\"3 0 PLAY B8\",\"3 1 DRAW\",\"3 1 PLAY B9\",\"3 2 DRAW\",\"3 2 PLAY W2\",\"3 3 CHI W2 J2\",\"2 F1\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY T5\",\"3 2 DRAW\",\"3 2 PLAY F2\",\"3 3 DRAW\",\"3 3 PLAY F2\",\"2 B8\",\"3 0 PLAY B8\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"3 3 DRAW\",\"3 3 PLAY F1\",\"2 F1\",\"3 0 PLAY W5\",\"3 1 DRAW\",\"3 1 PLAY T1\",\"3 2 DRAW\",\"3 2 PLAY T9\",\"3 3 DRAW\",\"3 3 PLAY B6\",\"2 T2\",\"3 0 PLAY T2\",\"3 1 DRAW\",\"3 1 PLAY W8\",\"3 2 DRAW\",\"3 2 PLAY J1\",\"3 0 PENG F2\",\"3 1 DRAW\",\"3 1 PLAY W3\",\"3 2 DRAW\",\"3 2 PLAY J2\",\"3 3 DRAW\",\"3 3 PLAY F3\",\"2 W6\",\"3 0 PLAY F4\",\"3 1 DRAW\",\"3 1 PLAY W8\",\"3 2 DRAW\",\"3 2 PLAY F3\",\"3 3 DRAW\",\"3 3 PLAY B2\",\"2 W2\",\"3 0 PLAY W2\",\"3 1 DRAW\",\"3 1 PLAY T4\",\"3 2 DRAW\",\"3 2 PLAY T3\",\"3 3 PENG W9\",\"2 T5\"],\"responses\":[\"PASS\",\"PASS\",\"PLAY B8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PENG F2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
+    string myin = string("{\"requests\":[\"0 3 2\",\"1 0 0 0 0 T7 W4 W8 W9 W4 F1 T2 W3 W5 J1 W5 T2 T2\",\"3 0 DRAW\",\"3 0 PLAY W6\",\"3 1 DRAW\",\"3 1 PLAY J2\",\"3 2 DRAW\",\"3 2 PLAY J1\",\"2 F4\",\"3 3 PLAY T7\",\"3 0 CHI T6 J2\",\"3 1 DRAW\",\"3 1 PLAY F4\",\"3 2 PENG F3\",\"2 J1\",\"3 3 PLAY F1\",\"3 0 DRAW\",\"3 0 PLAY T7\",\"3 1 DRAW\",\"3 1 PLAY F1\",\"3 2 DRAW\",\"3 2 PLAY W1\",\"2 F2\",\"3 3 PLAY F2\",\"3 0 DRAW\",\"3 0 PLAY F2\",\"3 1 DRAW\",\"3 1 PLAY W6\",\"3 2 DRAW\",\"3 2 PLAY F1\",\"2 F3\",\"3 3 PLAY F3\",\"3 0 DRAW\",\"3 0 PLAY B1\",\"3 1 DRAW\",\"3 1 PLAY J1\",\"3 3 PENG F4\",\"3 0 DRAW\",\"3 0 PLAY B2\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"3 2 DRAW\",\"3 2 PLAY J3\",\"2 F1\",\"3 3 PLAY F1\",\"3 0 DRAW\",\"3 0 PLAY T6\",\"3 1 DRAW\",\"3 1 PLAY T5\",\"3 2 DRAW\",\"3 2 PLAY B9\",\"3 0 PENG B7\",\"3 1 DRAW\",\"3 1 PLAY T1\",\"3 2 DRAW\",\"3 2 PLAY T1\",\"2 W6\",\"3 3 PLAY W6\",\"3 0 DRAW\",\"3 0 PLAY W5\",\"3 3 PENG W9\",\"3 0 DRAW\",\"3 0 PLAY W8\",\"3 1 DRAW\",\"3 1 PLAY B6\",\"3 2 DRAW\",\"3 2 PLAY T1\",\"2 B3\",\"3 3 PLAY W8\",\"3 0 DRAW\",\"3 0 PLAY B4\",\"3 1 DRAW\",\"3 1 PLAY W6\",\"3 2 DRAW\",\"3 2 PLAY T8\",\"2 W9\",\"3 3 PLAY W9\",\"3 0 DRAW\",\"3 0 PLAY T7\",\"3 1 DRAW\",\"3 1 PLAY J3\",\"3 2 DRAW\",\"3 2 PLAY W7\",\"2 T9\",\"3 3 PLAY T9\",\"3 2 PENG T5\",\"2 T8\",\"3 3 PLAY T8\",\"3 0 DRAW\",\"3 0 PLAY T4\",\"3 2 PENG B5\",\"2 B6\",\"3 3 PLAY B6\",\"3 0 DRAW\",\"3 0 PLAY W3\",\"3 1 DRAW\",\"3 1 PLAY B3\",\"3 2 DRAW\",\"3 2 PLAY B3\",\"2 W1\",\"3 3 PLAY B3\",\"3 0 CHI B4 B8\",\"3 1 DRAW\",\"3 1 PLAY W3\",\"3 2 CHI W3 W3\",\"2 F2\",\"3 3 PLAY F2\",\"3 0 DRAW\",\"3 0 PLAY W2\"],\"responses\":[\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T7\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PENG F4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F1\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W6\",\"PASS\",\"PASS\",\"PENG W9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS") + string("\",\"PLAY T9\",\"PASS\",\"PASS\",\"PLAY T8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B6\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B3\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F2\",\"PASS\",\"PASS\"]}");
     reader.parse(myin, input_json);
     //==========debug============
 #endif
