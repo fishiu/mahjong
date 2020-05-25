@@ -1513,7 +1513,7 @@ string WuMenQi_bestcard() {
                 //这张牌数量是单张
                 string _card = makeCardName(_color, i);
                 //下面这个if "或者 ||" 后面表示如果是顺子的一部分但是数量大于1
-                if (my_active_card[_card] == 1 && i != _n ||
+                if (my_active_card[_card] == 1 && abs(i - _n) > 1 ||
                     abs(i - _n) <= 1 && my_active_card[_card] > 1) {
                     return _card;
                 }
@@ -1525,11 +1525,65 @@ string WuMenQi_bestcard() {
     string color_list = "BTWFJ";
     char target_color = 'B';
     int color_cnt_max = 0;
+    int max_count = 1;
     for (int i = 0; i < 5; ++i) {
         int color_cnt = getColorActiveCards(color_list[i]).size();
-        if (color_cnt > color_cnt_max) {
+        if (color_cnt >= color_cnt_max) {
             color_cnt_max = color_cnt;
             target_color = color_list[i];
+            if (color_cnt == color_cnt_max)
+                max_count++;
+            else
+                max_count = 1;
+        }
+    }
+
+    //如果数量最多的牌不止一种，而且其中有风或者箭，那么优先处理风、箭 ==> 单排，非对子
+    if (max_count > 1) {
+        //风牌数量最多
+        if (getColorActiveCards('F').size() == color_cnt_max) {
+            //先看看有没有单牌
+            vector<string> f_vector = getColorActiveCards('F');
+            map<string, int> f_map = easy_make_map(f_vector.begin(), f_vector.end());
+            for (auto itr = f_map.begin(); itr != f_map.end(); ++itr) {
+                //记录剩下张数最少的单张
+                auto min_itr = f_map.begin();
+                int min_rest = 4;
+                if (itr->second == 1 && rest_card[itr->first] <= min_rest) {
+                    min_rest = rest_card[itr->first];
+                    min_itr = itr;
+                }
+                if (min_rest < 4)
+                    return min_itr->first;
+            }
+        } else if (getColorActiveCards('J').size() == color_cnt_max) {
+            //先看看有没有单牌
+            vector<string> j_vector = getColorActiveCards('J');
+            map<string, int> j_map = easy_make_map(j_vector.begin(), j_vector.end());
+            for (auto itr = j_map.begin(); itr != j_map.end(); ++itr) {
+                //记录剩下张数最少的单张
+                auto min_itr = j_map.begin();
+                int min_rest = 4;
+                if (itr->second == 1 && rest_card[itr->first] <= min_rest) {
+                    min_rest = rest_card[itr->first];
+                    min_itr = itr;
+                }
+                if (min_rest < 4)
+                    return min_itr->first;
+            }
+        }
+    }
+
+    //如果还没有选出，那么无脑扔数量多的花色
+    for (int i = 0; i < 5; ++i) {
+        int color_cnt = getColorActiveCards(color_list[i]).size();
+        if (color_cnt >= color_cnt_max && ) {
+            color_cnt_max = color_cnt;
+            target_color = color_list[i];
+            if (color_cnt == color_cnt_max)
+                max_count++;
+            else
+                max_count = 1;
         }
     }
     vector<string> color_cards_vector = getColorActiveCards(target_color);
@@ -2147,7 +2201,7 @@ int main() {
 #else
     //==========debug============
     Json::Reader reader;
-    string myin = string("{\"requests\":[\"0 0 3\",\"1 0 0 0 0 F3 T5 B3 W9 F2 W5 W5 T9 T6 T8 T7 B3 T5\",\"2 F3\",\"3 0 PLAY F2\",\"3 1 DRAW\",\"3 1 PLAY B4\",\"3 2 DRAW\",\"3 2 PLAY J2\",\"3 3 DRAW\",\"3 3 PLAY B9\",\"2 T5\",\"3 0 PLAY T8\",\"3 1 DRAW\",\"3 1 PLAY B8\",\"3 2 CHI B8 F1\",\"3 1 PENG T5\"],\"responses\":[\"PASS\",\"PASS\",\"PLAY F2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
+    string myin = string("{\"requests\":[\"0 0 1\",\"1 0 0 0 0 B4 T6 B8 B4 W5 W8 J1 B4 T7 J1 F4 F2 W7\",\"2 T9\",\"3 0 PLAY B8\",\"3 1 DRAW\",\"3 1 PLAY B9\",\"3 2 DRAW\",\"3 2 PLAY W2\",\"3 3 CHI W2 J2\",\"2 F1\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY T5\",\"3 2 DRAW\",\"3 2 PLAY F2\",\"3 3 DRAW\",\"3 3 PLAY F2\",\"2 B8\",\"3 0 PLAY B8\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"3 3 DRAW\",\"3 3 PLAY F1\",\"2 F1\",\"3 0 PLAY W5\",\"3 1 DRAW\",\"3 1 PLAY T1\",\"3 2 DRAW\",\"3 2 PLAY T9\",\"3 3 DRAW\",\"3 3 PLAY B6\",\"2 T2\",\"3 0 PLAY T2\",\"3 1 DRAW\",\"3 1 PLAY W8\",\"3 2 DRAW\",\"3 2 PLAY J1\",\"3 0 PENG F2\",\"3 1 DRAW\",\"3 1 PLAY W3\",\"3 2 DRAW\",\"3 2 PLAY J2\",\"3 3 DRAW\",\"3 3 PLAY F3\",\"2 W6\"],\"responses\":[\"PASS\",\"PASS\",\"PLAY B8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PENG F2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
     reader.parse(myin, input_json);
     //==========debug============
 #endif
