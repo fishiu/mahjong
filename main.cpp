@@ -447,6 +447,31 @@ string checkTing() {
         return throw_card;
     }
 }
+
+char my_active_main_color() {
+	char zhuse = 'n';
+	int maxnum = 0;
+	int tiao = 0, bing = 0, wan = 0;
+	for (auto it = my_active_card.begin(); it != my_active_card.end(); it++) {
+		if (it->first[0] == 'T') tiao += it->second;
+		if (it->first[0] == 'B') bing += it->second;
+		if (it->first[0] == 'W') wan += it->second;
+	}
+	if (tiao > maxnum) {
+		zhuse = 'T';
+		maxnum = tiao;
+	}
+	if (bing > maxnum) {
+		zhuse = 'B';
+		maxnum = bing;
+	}
+	if (wan > maxnum) {
+		zhuse = 'W';
+		maxnum = wan;
+	}
+	return zhuse;
+}
+
 /**
  * 从两头向中间除去单牌 W,B,T
  * @return 相应的牌名 如果找不到返回 Fail
@@ -455,6 +480,7 @@ string checkTing() {
 //可以考虑加上出手里最少的牌型
 string single() {
     setMyCard(my_player_id);
+	char main_huapai = my_active_main_color();
     for (int remain = 4; remain >= 1; remain--) {
         for (int i = 1; i <= 4; i++) {
             if (my_active_card[makeCardName('F', i)] == 1 && getCardNumAll(makeCardName('F', i)) == remain) {
@@ -468,6 +494,12 @@ string single() {
         }
         int i = 1, j = 9;
         for (; i <= j; i++, j--) {
+			if (my_active_card[makeCardName(main_huapai, i)] == 1 && getCardNumAll(makeCardName(main_huapai, i)) == remain) {
+				return makeCardName(main_huapai, i);
+			}
+			if (j != i && my_active_card[makeCardName(main_huapai, j)] == 1 && getCardNumAll(makeCardName(main_huapai, j)) == remain) {
+				return makeCardName(main_huapai, j);
+			}
             if (my_active_card[makeCardName('W', i)] == 1 && getCardNumAll(makeCardName('W', i)) == remain) {
                 return makeCardName('W', i);
             }
