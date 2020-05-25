@@ -1577,7 +1577,7 @@ string WuMenQi_bestcard() {
     //如果还没有选出，那么无脑扔数量多的花色
     for (int i = 0; i < 5; ++i) {
         int color_cnt = getColorActiveCards(color_list[i]).size();
-        if (color_cnt >= color_cnt_max && ) {
+        if (color_cnt >= color_cnt_max) {
             color_cnt_max = color_cnt;
             target_color = color_list[i];
             if (color_cnt == color_cnt_max)
