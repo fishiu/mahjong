@@ -2037,6 +2037,7 @@ void playCard() {
     //以上是随机算法
     //这里这个 erase 是针对initCondition作出的调整 因为下面的判断胡的函数和判断杠的函数都默认手牌是13张（不包括新摸的牌）
     all_card[my_player_id].erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
+    setMyCard(my_player_id);
     //判断能不能胡，如果能胡输出HU，并调用算番器
     bool tmpbool = checkHu(all_card[my_player_id], stmp);
     //str_out << "HU";
@@ -2202,7 +2203,7 @@ int main() {
 #else
     //==========debug============
     Json::Reader reader;
-    string myin = string("{\"requests\":[\"0 0 1\",\"1 0 0 0 0 B4 T6 B8 B4 W5 W8 J1 B4 T7 J1 F4 F2 W7\",\"2 T9\",\"3 0 PLAY B8\",\"3 1 DRAW\",\"3 1 PLAY B9\",\"3 2 DRAW\",\"3 2 PLAY W2\",\"3 3 CHI W2 J2\",\"2 F1\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY T5\",\"3 2 DRAW\",\"3 2 PLAY F2\",\"3 3 DRAW\",\"3 3 PLAY F2\",\"2 B8\",\"3 0 PLAY B8\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"3 3 DRAW\",\"3 3 PLAY F1\",\"2 F1\",\"3 0 PLAY W5\",\"3 1 DRAW\",\"3 1 PLAY T1\",\"3 2 DRAW\",\"3 2 PLAY T9\",\"3 3 DRAW\",\"3 3 PLAY B6\",\"2 T2\",\"3 0 PLAY T2\",\"3 1 DRAW\",\"3 1 PLAY W8\",\"3 2 DRAW\",\"3 2 PLAY J1\",\"3 0 PENG F2\",\"3 1 DRAW\",\"3 1 PLAY W3\",\"3 2 DRAW\",\"3 2 PLAY J2\",\"3 3 DRAW\",\"3 3 PLAY F3\",\"2 W6\"],\"responses\":[\"PASS\",\"PASS\",\"PLAY B8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PENG F2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
+    string myin = string("{\"requests\":[\"0 0 1\",\"1 0 0 0 0 B4 T6 B8 B4 W5 W8 J1 B4 T7 J1 F4 F2 W7\",\"2 T9\",\"3 0 PLAY B8\",\"3 1 DRAW\",\"3 1 PLAY B9\",\"3 2 DRAW\",\"3 2 PLAY W2\",\"3 3 CHI W2 J2\",\"2 F1\",\"3 0 PLAY T9\",\"3 1 DRAW\",\"3 1 PLAY T5\",\"3 2 DRAW\",\"3 2 PLAY F2\",\"3 3 DRAW\",\"3 3 PLAY F2\",\"2 B8\",\"3 0 PLAY B8\",\"3 1 DRAW\",\"3 1 PLAY F2\",\"3 2 DRAW\",\"3 2 PLAY W6\",\"3 3 DRAW\",\"3 3 PLAY F1\",\"2 F1\",\"3 0 PLAY W5\",\"3 1 DRAW\",\"3 1 PLAY T1\",\"3 2 DRAW\",\"3 2 PLAY T9\",\"3 3 DRAW\",\"3 3 PLAY B6\",\"2 T2\",\"3 0 PLAY T2\",\"3 1 DRAW\",\"3 1 PLAY W8\",\"3 2 DRAW\",\"3 2 PLAY J1\",\"3 0 PENG F2\",\"3 1 DRAW\",\"3 1 PLAY W3\",\"3 2 DRAW\",\"3 2 PLAY J2\",\"3 3 DRAW\",\"3 3 PLAY F3\",\"2 W6\",\"3 0 PLAY F4\",\"3 1 DRAW\",\"3 1 PLAY W8\",\"3 2 DRAW\",\"3 2 PLAY F3\",\"3 3 DRAW\",\"3 3 PLAY B2\",\"2 W2\",\"3 0 PLAY W2\",\"3 1 DRAW\",\"3 1 PLAY T4\",\"3 2 DRAW\",\"3 2 PLAY T3\",\"3 3 PENG W9\",\"2 T5\"],\"responses\":[\"PASS\",\"PASS\",\"PLAY B8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T9\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY B8\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W5\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY T2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PENG F2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY F4\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PLAY W2\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\",\"PASS\"]}");
     reader.parse(myin, input_json);
     //==========debug============
 #endif
