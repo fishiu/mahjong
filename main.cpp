@@ -2071,11 +2071,6 @@ void playCard() {
     if (tmpbool && getFan(current_card) >= 8) {
         str_out << "HU";
     }
-    else if (left_card_num[(my_player_id + 1) % 4] == 0) {
-        //针对复式赛制的牌荒问题，如果发现当前玩家的下家已经没牌了
-        str_out << "PASS";
-        return;
-    }
     else if (tmpbool && chooseStrategy() == STG_QUAN_QIU_REN) {
         //如果胡了但是番数没到
         //str_out << getFan(current_card);
@@ -2087,14 +2082,14 @@ void playCard() {
         //生成一个自己手中牌的map<string,int>
         setMyCard(my_player_id);
         //bugang
-        if (find(peng.begin(), peng.end(), stmp) != peng.end()) {
+        if (find(peng.begin(), peng.end(), stmp) != peng.end() && !(left_card_num[(my_player_id + 1) % 4] == 0)) {
             //这句多余peng.erase(find(all_card[my_player_id].begin(), all_card[my_player_id].end(), stmp));
             gang.push_back(stmp);
             str_out << "BUGANG " << stmp;
             return;
         }
         //判断能否杠
-        if (checkGang(stmp)  && chooseStrategy() != STG_QUAN_QIU_REN) {
+        if (checkGang(stmp)  && !(left_card_num[(my_player_id + 1) % 4] == 0) && chooseStrategy() != STG_QUAN_QIU_REN) {
             all_card[my_player_id].push_back(stmp);
             str_out << "GANG " << stmp;
             //这里是暗杠，还没处理
